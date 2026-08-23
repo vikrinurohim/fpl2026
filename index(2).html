@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Nippon Paint — FPL League Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0F2C59;
+            --primary-light: #1B4F8A;
+            --accent: #2563EB;
+            --success: #059669;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --bg: #F1F5F9;
+            --card: #FFFFFF;
+            --text: #0F172A;
+            --text-secondary: #475569;
+            --muted: #94A3B8;
+            --border: #E2E8F0;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .header {
+            background: linear-gradient(135deg, #0F2C59 0%, #1B4F8A 50%, #2563EB 100%);
+            color: white;
+            padding: 2.5rem 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .header-content { position: relative; z-index: 1; }
+        .header h1 { font-size: 1.85rem; font-weight: 800; margin-bottom: 0.35rem; letter-spacing: -0.03em; }
+        .header .subtitle { font-size: 0.95rem; opacity: 0.9; font-weight: 500; }
+        .header .meta { font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem; }
+        .container { max-width: 1080px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+        .filter-bar {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border);
+        }
+        .filter-bar label { font-weight: 600; font-size: 0.875rem; color: var(--text-secondary); }
+        .filter-bar select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: #F8FAFC;
+            color: var(--text);
+            font-weight: 500;
+            min-width: 160px;
+            cursor: pointer;
+        }
+        .filter-bar select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .last-update { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+        .tabs {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            background: var(--card);
+            padding: 0.4rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .tab {
+            padding: 0.6rem 1.1rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.84rem;
+            font-family: inherit;
+            color: var(--text-secondary);
+            transition: all 0.18s ease;
+        }
+        .tab:hover { background: #F1F5F9; color: var(--primary); }
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 6px rgba(15, 44, 89, 0.25);
+        }
+        .panel { display: none; }
+        .panel.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin-bottom: 1.15rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 2px solid #E0E7FF;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 0.65rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        th:first-child { border-radius: 8px 0 0 0; }
+        th:last-child { border-radius: 0 8px 0 0; }
+        td {
+            padding: 0.7rem 0.65rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background: #F8FAFC; }
+        .rank-1 { background: #ECFDF5 !important; font-weight: 600; }
+        .rank-2, .rank-3 { background: #EFF6FF !important; }
+        .rank-low { background: #FFFBEB !important; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.85rem;
+            margin-top: 1.25rem;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+            border-radius: 10px;
+            padding: 1.1rem 0.9rem;
+            text-align: center;
+            border: 1px solid #BAE6FD;
+        }
+        .stat-box .value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .stat-box .label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem; font-weight: 500; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .badge-green { background: #D1FAE5; color: #065F46; }
+        .badge-blue { background: #DBEAFE; color: #1E40AF; }
+        .badge-yellow { background: #FEF3C7; color: #92400E; }
+        .badge-red { background: #FEE2E2; color: #991B1B; }
+        .chart-container { position: relative; height: 270px; margin: 0.5rem 0 0.25rem; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .squad-detail {
+            background: #F8FAFC;
+            border-radius: 10px;
+            padding: 1.1rem 1.2rem;
+            margin-bottom: 0.9rem;
+            border: 1px solid var(--border);
+        }
+        .squad-detail h4 { color: var(--primary); margin-bottom: 0.35rem; font-size: 0.95rem; }
+        .squad-detail .meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.55rem; font-weight: 500; }
+        .pos-label { font-weight: 600; color: var(--primary-light); font-size: 0.8rem; min-width: 36px; display: inline-block; }
+        .squad-detail p { font-size: 0.84rem; margin-bottom: 0.2rem; }
+        .insight-box {
+            background: #F8FAFC;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.85rem;
+            border-radius: 0 10px 10px 0;
+        }
+        .insight-box h4 { color: var(--primary); margin-bottom: 0.3rem; font-size: 0.95rem; }
+        .insight-box p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.55; }
+        .note {
+            background: #F0F9FF;
+            border-radius: 10px;
+            padding: 0.9rem 1.15rem;
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            margin-top: 1.1rem;
+            border: 1px solid #BAE6FD;
+        }
+        .footer { text-align: center; padding: 1.75rem 1rem; color: var(--muted); font-size: 0.8rem; font-weight: 500; }
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1.75rem 1rem 1.4rem;
+            }
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            .header .subtitle {
+                font-size: 0.88rem;
+            }
+            .header .meta {
+                font-size: 0.75rem;
+            }
+            .container {
+                padding: 1rem 0.85rem 2.5rem;
+            }
+            .filter-bar {
+                padding: 0.85rem 1rem;
+                gap: 0.65rem;
+            }
+            .filter-bar select {
+                min-width: 130px;
+                font-size: 0.85rem;
+                padding: 0.45rem 0.75rem;
+            }
+            .tabs {
+                gap: 0.3rem;
+                padding: 0.35rem;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .tab {
+                padding: 0.5rem 0.85rem;
+                font-size: 0.78rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            .card {
+                padding: 1.15rem;
+            }
+            .card h2 {
+                font-size: 1.05rem;
+            }
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.65rem;
+            }
+            .stat-box {
+                padding: 0.9rem 0.6rem;
+            }
+            .stat-box .value {
+                font-size: 1.3rem;
+            }
+            .stat-box .label {
+                font-size: 0.7rem;
+            }
+            /* Tables scroll horizontally on mobile */
+            .card {
+                overflow-x: auto;
+            }
+            table {
+                font-size: 0.8rem;
+                min-width: 520px;
+            }
+            th, td {
+                padding: 0.6rem 0.45rem;
+            }
+            .squad-detail {
+                padding: 0.95rem 1rem;
+            }
+            .squad-detail h4 {
+                font-size: 0.9rem;
+            }
+            .squad-detail p {
+                font-size: 0.8rem;
+            }
+            .chart-container {
+                height: 240px;
+            }
+            .insight-box {
+                padding: 0.85rem 1rem;
+            }
+            .insight-box h4 {
+                font-size: 0.9rem;
+            }
+            .insight-box p {
+                font-size: 0.82rem;
+            }
+            .footer {
+                font-size: 0.75rem;
+                padding: 1.4rem 0.75rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .header h1 {
+                font-size: 1.25rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .tab {
+                padding: 0.45rem 0.7rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>QA Nippon Paint</h1>
+            <p class="subtitle">Fantasy Premier League · Classic League Analysis</p>
+            <p class="meta">League ID 1331564 · Season 2026/27</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filter-bar">
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <label for="gwSelect">Gameweek</label>
+                <select id="gwSelect">
+                    <option value="1" selected>Gameweek 1</option>
+                </select>
+            </div>
+            <div class="last-update">Data per 23 Aug 2026 · 22:13 UTC</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="standings">Standings</button>
+            <button class="tab" data-tab="squads">Squad Analysis</button>
+            <button class="tab" data-tab="formations">Formasi & Klub</button>
+            <button class="tab" data-tab="weekly">Peringkat Mingguan</button>
+            <button class="tab" data-tab="chips">Chips</button>
+            <button class="tab" data-tab="hits">Transfer Hits</button>
+            <button class="tab" data-tab="insights">Key Insights</button>
+        </div>
+
+        <!-- STANDINGS -->
+        <div id="standings" class="panel active">
+            <div class="card">
+                <h2>Overall Standings <span id="standingsLabel" style="font-weight:500;font-size:0.9rem;color:var(--text-secondary)"></span></h2>
+                <div id="standingsTable"></div>
+                <div class="stats-grid" id="standingsStats"></div>
+            </div>
+            <div class="card">
+                <h2>Distribusi Poin</h2>
+                <div class="chart-container"><canvas id="pointsChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- SQUADS -->
+        <div id="squads" class="panel">
+            <div class="card">
+                <h2>Squad Analysis <span id="squadsLabel" style="font-weight:500;font-size:0.9rem;color:var(--text-secondary)"></span></h2>
+                <div id="squadsContent"></div>
+            </div>
+        </div>
+
+        <!-- FORMATIONS -->
+        <div id="formations" class="panel">
+            <div id="formationsContent"></div>
+        </div>
+
+        <!-- WEEKLY (history - always shows all) -->
+        <div id="weekly" class="panel">
+            <div class="card">
+                <h2>Peringkat Pertama & Terakhir per Gameweek</h2>
+                <div id="weeklyTable"></div>
+            </div>
+            <div class="card">
+                <h2>Akumulasi Sepanjang Musim</h2>
+                <div id="weeklyAccum"></div>
+            </div>
+        </div>
+
+        <!-- CHIPS (history) -->
+        <div id="chips" class="panel">
+            <div class="card">
+                <h2>Penggunaan Chips</h2>
+                <div id="chipsContent"></div>
+            </div>
+        </div>
+
+        <!-- HITS (history) -->
+        <div id="hits" class="panel">
+            <div class="card">
+                <h2>Transfer Hits</h2>
+                <div id="hitsContent"></div>
+                <div class="chart-container" style="margin-top:1.25rem"><canvas id="hitsChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- INSIGHTS -->
+        <div id="insights" class="panel">
+            <div class="card">
+                <h2>Key Insights <span id="insightsLabel" style="font-weight:500;font-size:0.9rem;color:var(--text-secondary)"></span></h2>
+                <div id="insightsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        QA Nippon Paint · FPL Classic League Analysis · League ID 1331564<br>
+        Data from Official FPL API
+    </div>
+
+<script>
+/* ========== DATA STORE (siap multi-GW) ========== */
+const LEAGUE_DATA = {
+  1: {
+    label: "Gameweek 1",
+    updated: "23 Aug 2026 · 22:13 UTC",
+    standings: [
+      { rank:1, team:"SCOUSER", manager:"Zava Anbiya", gw:47, total:47, overall:1323493 },
+      { rank:2, team:"sinar muda fc", manager:"Andri Varane", gw:45, total:45, overall:1693842 },
+      { rank:3, team:"Betelguese", manager:"Vikri Nur Rohim", gw:41, total:41, overall:2666208 },
+      { rank:4, team:"King Polenk", manager:"Andre Nosega Purnama", gw:36, total:36, overall:4279248 },
+      { rank:5, team:"Parpas", manager:"Rendy P", gw:33, total:33, overall:5324535 },
+      { rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", gw:28, total:28, overall:6908593 }
+    ],
+    first: { team:"SCOUSER", manager:"Zava Anbiya", pts:47 },
+    last:  { team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:28 },
+    chips: [
+      { manager:"Zava Anbiya", team:"SCOUSER", chip:"Bench Boost", note:"Satu-satunya yang aktifkan chip" },
+      { manager:"Andri Varane", team:"sinar muda fc", chip:null },
+      { manager:"Vikri Nur Rohim", team:"Betelguese", chip:null },
+      { manager:"Andre Nosega Purnama", team:"King Polenk", chip:null },
+      { manager:"Rendy P", team:"Parpas", chip:null },
+      { manager:"Muhammad Fariz Azhari", team:"Giri - giri", chip:null }
+    ],
+    hits: [], // no hits
+    squads: [
+      {
+        rank:1, team:"SCOUSER", manager:"Zava Anbiya", pts:47, form:"3-4-3", chip:"Bench Boost", capt:"Virgil van Dijk",
+        gk:"Verbruggen (BHA)", def:"Maguire (MUN), Calafiori (ARS), Virgil (LIV) (C)",
+        mid:"Szoboszlai (LIV), B.Fernandes (MUN), Tzolis (ARS), Mbeumo (MUN)",
+        fwd:"Isak (LIV), João Pedro (CHE), Calvert-Lewin (LEE)",
+        clubs:"Liverpool (3), Man United (3), Arsenal (2)"
+      },
+      {
+        rank:2, team:"sinar muda fc", manager:"Andri Varane", pts:45, form:"3-4-3", chip:null, capt:"Haaland",
+        gk:"Verbruggen (BHA)", def:"Calafiori (ARS), Muharemović (LEE), Maguire (MUN)",
+        mid:"Szoboszlai (LIV), Tzolis (ARS), B.Fernandes (MUN) (VC), Le Fée (SUN)",
+        fwd:"Calvert-Lewin (LEE), Haaland (MCI) (C), João Pedro (CHE)",
+        clubs:"Arsenal (2), Man United (2), Leeds (2)"
+      },
+      {
+        rank:3, team:"Betelguese", manager:"Vikri Nur Rohim", pts:41, form:"3-4-3", chip:null, capt:"Haaland",
+        gk:"Verbruggen (BHA)", def:"Gabriel (ARS), Guéhi (MCI), Shaw (MUN)",
+        mid:"Rice (ARS), Mbeumo (MUN) (VC), Szoboszlai (LIV), Foden (MCI)",
+        fwd:"Calvert-Lewin (LEE), Haaland (MCI) (C), João Pedro (CHE)",
+        clubs:"Arsenal (2), Man City (2), Man United (2)"
+      },
+      {
+        rank:4, team:"King Polenk", manager:"Andre Nosega Purnama", pts:36, form:"4-4-2", chip:null, capt:"João Pedro",
+        gk:"Raya (ARS)", def:"Gabriel (ARS), O'Reilly (MCI), Mosquera (ARS), Ballard (SUN)",
+        mid:"B.Fernandes (MUN) (VC), Rogers (CHE), Dewsbury-Hall (EVE), Le Fée (SUN)",
+        fwd:"João Pedro (CHE) (C), Brobbey (SUN)",
+        clubs:"Arsenal (3), Sunderland (2) · Paling differential"
+      },
+      {
+        rank:5, team:"Parpas", manager:"Rendy P", pts:33, form:"3-5-2", chip:null, capt:"Haaland",
+        gk:"Kinsky (TOT)", def:"Gabriel (ARS), Pedro Porro (TOT), Shaw (MUN)",
+        mid:"Hughes (CRY), B.Fernandes (MUN) (VC), Szoboszlai (LIV), Mbeumo (MUN), Ndiaye (EVE)",
+        fwd:"Haaland (MCI) (C), João Pedro (CHE)",
+        clubs:"Man United (3), Tottenham (2)"
+      },
+      {
+        rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:28, form:"3-4-3", chip:null, capt:"Haaland",
+        gk:"Kinsky (TOT)", def:"Gabriel (ARS), Mitchell (CRY), Shaw (MUN)",
+        mid:"B.Fernandes (MUN) (VC), Mbeumo (MUN), Szoboszlai (LIV), Groß (BHA)",
+        fwd:"Haaland (MCI) (C), João Pedro (CHE), Calvert-Lewin (LEE)",
+        clubs:"Man United (3) · 18 pts di bangku"
+      }
+    ]
+  }
+  // GW2, GW3, ... akan ditambahkan di sini saat update
+};
+
+/* ========== HISTORY HELPERS ========== */
+function getAllGWs() {
+  return Object.keys(LEAGUE_DATA).map(Number).sort((a,b) => a-b);
+}
+
+function buildWeeklyHistory() {
+  const rows = getAllGWs().map(gw => {
+    const d = LEAGUE_DATA[gw];
+    return { gw, first: d.first, last: d.last };
+  });
+  return rows;
+}
+
+function buildAccum() {
+  const managers = {};
+  getAllGWs().forEach(gw => {
+    const d = LEAGUE_DATA[gw];
+    const fKey = d.first.manager;
+    const lKey = d.last.manager;
+    if (!managers[fKey]) managers[fKey] = { manager: fKey, team: d.first.team, first:0, last:0 };
+    if (!managers[lKey]) managers[lKey] = { manager: lKey, team: d.last.team, first:0, last:0 };
+    managers[fKey].first++;
+    managers[lKey].last++;
+  });
+  // ensure all current managers appear
+  const latest = LEAGUE_DATA[Math.max(...getAllGWs())];
+  latest.standings.forEach(s => {
+    if (!managers[s.manager]) managers[s.manager] = { manager: s.manager, team: s.team, first:0, last:0 };
+  });
+  return Object.values(managers).sort((a,b) => b.first - a.first || a.last - b.last);
+}
+
+/* ========== RENDER ========== */
+let pointsChartInst = null;
+let hitsChartInst = null;
+
+function render(gw) {
+  const data = LEAGUE_DATA[gw];
+  if (!data) return;
+
+  document.getElementById('standingsLabel').textContent = `· ${data.label}`;
+  document.getElementById('squadsLabel').textContent = `· ${data.label}`;
+  document.getElementById('insightsLabel').textContent = `· ${data.label}`;
+  document.querySelector('.last-update').textContent = `Data per ${data.updated}`;
+
+  // Standings table
+  let stHtml = `<table><thead><tr><th>Rank</th><th>Team</th><th>Manager</th><th>GW</th><th>Total</th><th>Overall Rank</th></tr></thead><tbody>`;
+  data.standings.forEach((r,i) => {
+    let cls = i===0 ? 'rank-1' : i<3 ? 'rank-2' : i>=4 ? 'rank-low' : '';
+    stHtml += `<tr class="${cls}"><td>${r.rank}</td><td><strong>${r.team}</strong></td><td>${r.manager}</td><td>${r.gw}</td><td>${r.total}</td><td>${r.overall.toLocaleString()}</td></tr>`;
+  });
+  stHtml += `</tbody></table>`;
+  document.getElementById('standingsTable').innerHTML = stHtml;
+
+  const pts = data.standings.map(s => s.gw);
+  const avg = (pts.reduce((a,b)=>a+b,0)/pts.length).toFixed(1);
+  document.getElementById('standingsStats').innerHTML = `
+    <div class="stat-box"><div class="value">${avg}</div><div class="label">Rata-rata Poin</div></div>
+    <div class="stat-box"><div class="value">${Math.max(...pts)}</div><div class="label">Tertinggi</div></div>
+    <div class="stat-box"><div class="value">${Math.min(...pts)}</div><div class="label">Terendah</div></div>
+    <div class="stat-box"><div class="value">${Math.max(...pts)-Math.min(...pts)}</div><div class="label">Rentang</div></div>
+    <div class="stat-box"><div class="value">${data.standings.length}</div><div class="label">Jumlah Tim</div></div>`;
+
+  // Points chart
+  if (pointsChartInst) pointsChartInst.destroy();
+  pointsChartInst = new Chart(document.getElementById('pointsChart'), {
+    type: 'bar',
+    data: {
+      labels: data.standings.map(s => s.team),
+      datasets: [{ data: data.standings.map(s => s.gw),
+        backgroundColor: data.standings.map((_,i) => i===0?'#059669':i<3?'#2563EB':'#D97706'),
+        borderRadius: 6, borderSkipped: false }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, grid: { color: '#E2E8F0' } }, x: { grid: { display: false } } }
+    }
+  });
+
+  // Squads
+  let sqHtml = '';
+  data.squads.forEach(s => {
+    const ptsBadge = s.pts >= 45 ? 'badge-green' : s.pts >= 40 ? 'badge-blue' : s.pts >= 35 ? 'badge-yellow' : 'badge-red';
+    sqHtml += `<div class="squad-detail">
+      <h4>${s.rank}. ${s.team} — ${s.manager} <span class="badge ${ptsBadge}">${s.pts} pts</span></h4>
+      <div class="meta">Formasi <span class="badge badge-green">${s.form}</span>
+        ${s.chip ? `· Chip <span class="badge badge-blue">${s.chip}</span>` : ''}
+        · Captain ${s.capt}</div>
+      <p><span class="pos-label">GK</span> ${s.gk}</p>
+      <p><span class="pos-label">DEF</span> ${s.def}</p>
+      <p><span class="pos-label">MID</span> ${s.mid}</p>
+      <p><span class="pos-label">FWD</span> ${s.fwd}</p>
+      <p style="margin-top:0.45rem;font-size:0.8rem;color:var(--muted)"><strong>Klub dominan:</strong> ${s.clubs}</p>
+    </div>`;
+  });
+  document.getElementById('squadsContent').innerHTML = sqHtml;
+
+  // Formations (simple summary for selected GW)
+  const formCount = {};
+  data.squads.forEach(s => { formCount[s.form] = (formCount[s.form]||0)+1; });
+  let formHtml = `<div class="two-col"><div class="card"><h2>Distribusi Formasi</h2><table><thead><tr><th>Formasi</th><th>Jumlah</th></tr></thead><tbody>`;
+  Object.entries(formCount).sort((a,b)=>b[1]-a[1]).forEach(([f,c]) => {
+    formHtml += `<tr class="${c>=3?'rank-1':''}"><td>${f}</td><td>${c}</td></tr>`;
+  });
+  formHtml += `</tbody></table></div>
+  <div class="card"><h2>Captain Choices</h2><table><thead><tr><th>Captain</th><th>Jumlah</th></tr></thead><tbody>`;
+  const captCount = {};
+  data.squads.forEach(s => { captCount[s.capt] = (captCount[s.capt]||0)+1; });
+  Object.entries(captCount).sort((a,b)=>b[1]-a[1]).forEach(([c,n]) => {
+    formHtml += `<tr class="${n>=3?'rank-1':''}"><td>${c}</td><td>${n}</td></tr>`;
+  });
+  formHtml += `</tbody></table></div></div>`;
+  document.getElementById('formationsContent').innerHTML = formHtml;
+
+  // Weekly history (all GWs)
+  const hist = buildWeeklyHistory();
+  let wHtml = `<table><thead><tr><th>Gameweek</th><th>Peringkat Pertama</th><th>Peringkat Terakhir</th></tr></thead><tbody>`;
+  hist.forEach(h => {
+    wHtml += `<tr>
+      <td><strong>GW${h.gw}</strong></td>
+      <td class="rank-1"><strong>${h.first.team}</strong><br><span style="font-size:0.8rem;color:var(--muted)">${h.first.manager} · ${h.first.pts} pts</span></td>
+      <td class="rank-low"><strong>${h.last.team}</strong><br><span style="font-size:0.8rem;color:var(--muted)">${h.last.manager} · ${h.last.pts} pts</span></td>
+    </tr>`;
+  });
+  wHtml += `</tbody></table>`;
+  document.getElementById('weeklyTable').innerHTML = wHtml;
+
+  const accum = buildAccum();
+  let aHtml = `<table><thead><tr><th>Manager</th><th>Team</th><th>Kali Rank 1</th><th>Kali Rank Terakhir</th><th>Selisih</th></tr></thead><tbody>`;
+  accum.forEach(m => {
+    const diff = m.first - m.last;
+    const cls = m.first > 0 ? 'rank-1' : m.last > 0 ? 'rank-low' : '';
+    aHtml += `<tr class="${cls}">
+      <td>${m.manager}</td><td>${m.team}</td>
+      <td style="font-weight:700;color:${m.first?'var(--success)':'inherit'}">${m.first}</td>
+      <td style="font-weight:700;color:${m.last?'var(--danger)':'inherit'}">${m.last}</td>
+      <td style="font-weight:700;color:${diff>0?'var(--success)':diff<0?'var(--danger)':'inherit'}">${diff>0?'+':''}${diff}</td>
+    </tr>`;
+  });
+  aHtml += `</tbody></table>`;
+  document.getElementById('weeklyAccum').innerHTML = aHtml;
+
+  // Chips (show selected GW + note about history)
+  let cHtml = `<table><thead><tr><th>Manager</th><th>Team</th><th>Chip</th><th>Keterangan</th></tr></thead><tbody>`;
+  data.chips.forEach(c => {
+    cHtml += `<tr class="${c.chip?'rank-1':''}">
+      <td>${c.manager}</td><td>${c.team}</td>
+      <td>${c.chip ? `<span class="badge badge-green">${c.chip}</span>` : `<span class="badge badge-yellow">—</span>`}</td>
+      <td>${c.note || (c.chip ? '' : 'Tidak menggunakan chip')}</td>
+    </tr>`;
+  });
+  cHtml += `</tbody></table>`;
+  document.getElementById('chipsContent').innerHTML = cHtml;
+
+  // Hits
+  let hHtml = `<table><thead><tr><th>Gameweek</th><th>Manager yang Kena Hit</th><th>Total Potongan</th></tr></thead><tbody>`;
+  getAllGWs().forEach(g => {
+    const d = LEAGUE_DATA[g];
+    const totalHit = d.hits.reduce((s,h) => s + (h.cost||0), 0);
+    hHtml += `<tr>
+      <td><strong>GW${g}</strong></td>
+      <td>${d.hits.length ? d.hits.map(h => `${h.team} (−${h.cost})`).join(', ') : '<span style="color:var(--muted);font-style:italic">Tidak ada</span>'}</td>
+      <td style="font-weight:700;color:${totalHit>0?'var(--danger)':'var(--success)'}">${totalHit}</td>
+    </tr>`;
+  });
+  hHtml += `</tbody></table>`;
+  document.getElementById('hitsContent').innerHTML = hHtml;
+
+  // Hits chart (accum per manager - currently all 0)
+  const hitByManager = {};
+  getAllGWs().forEach(g => {
+    LEAGUE_DATA[g].hits.forEach(h => {
+      hitByManager[h.team] = (hitByManager[h.team]||0) + h.cost;
+    });
+  });
+  const latestTeams = data.standings.map(s => s.team);
+  if (hitsChartInst) hitsChartInst.destroy();
+  hitsChartInst = new Chart(document.getElementById('hitsChart'), {
+    type: 'bar',
+    data: {
+      labels: latestTeams,
+      datasets: [{ data: latestTeams.map(t => hitByManager[t]||0), backgroundColor: '#DC2626', borderRadius: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, title: { display: true, text: 'Akumulasi Transfer Hits', font: { family: 'Plus Jakarta Sans', size: 14 } } },
+      scales: { y: { beginAtZero: true, max: 8 }, x: { grid: { display: false } } }
+    }
+  });
+
+  // Insights
+  document.getElementById('insightsContent').innerHTML = `
+    <div class="insight-box"><h4>1. Performa ${data.label}</h4>
+      <p>Rata-rata poin liga: <strong>${avg}</strong>. Tertinggi: <strong>${data.first.team}</strong> (${data.first.pts} pts). Terendah: <strong>${data.last.team}</strong> (${data.last.pts} pts).</p></div>
+    <div class="insight-box"><h4>2. Formasi Dominan</h4>
+      <p>Formasi paling banyak dipakai pada ${data.label}: <strong>${Object.entries(formCount).sort((a,b)=>b[1]-a[1])[0][0]}</strong>.</p></div>
+    <div class="insight-box"><h4>3. Catatan</h4>
+      <p>Gunakan filter Gameweek di atas untuk melihat detail Standings, Squad, Formasi, dan Insights per minggu. Tab Peringkat Mingguan, Chips, dan Transfer Hits menampilkan riwayat seluruh musim.</p></div>`;
+}
+
+/* ========== INIT ========== */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+const select = document.getElementById('gwSelect');
+// populate from data
+select.innerHTML = '';
+getAllGWs().reverse().forEach(gw => {
+  const opt = document.createElement('option');
+  opt.value = gw;
+  opt.textContent = LEAGUE_DATA[gw].label + (gw === Math.max(...getAllGWs()) ? ' (Latest)' : '');
+  select.appendChild(opt);
+});
+select.addEventListener('change', () => render(parseInt(select.value)));
+
+render(Math.max(...getAllGWs()));
+</script>
+</body>
+</html>
