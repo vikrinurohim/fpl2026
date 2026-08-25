@@ -224,124 +224,42 @@
             border: 1px solid #BAE6FD;
         }
         .footer { text-align: center; padding: 1.75rem 1rem; color: var(--muted); font-size: 0.8rem; font-weight: 500; }
-        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .header {
-                padding: 1.75rem 1rem 1.4rem;
-            }
-            .header h1 {
-                font-size: 1.4rem;
-            }
-            .header .subtitle {
-                font-size: 0.88rem;
-            }
-            .header .meta {
-                font-size: 0.75rem;
-            }
-            .container {
-                padding: 1rem 0.85rem 2.5rem;
-            }
-            .filter-bar {
-                padding: 0.85rem 1rem;
-                gap: 0.65rem;
-            }
-            .filter-bar select {
-                min-width: 130px;
-                font-size: 0.85rem;
-                padding: 0.45rem 0.75rem;
-            }
+            .header { padding: 1.75rem 1rem 1.4rem; }
+            .header h1 { font-size: 1.4rem; }
+            .header .subtitle { font-size: 0.88rem; }
+            .header .meta { font-size: 0.75rem; }
+            .container { padding: 1rem 0.85rem 2.5rem; }
+            .filter-bar { padding: 0.85rem 1rem; gap: 0.65rem; }
+            .filter-bar select { min-width: 130px; font-size: 0.85rem; padding: 0.45rem 0.75rem; }
             .tabs {
-                gap: 0.3rem;
-                padding: 0.35rem;
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
+                gap: 0.3rem; padding: 0.35rem; overflow-x: auto; flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch; scrollbar-width: none;
             }
-            .tabs::-webkit-scrollbar {
-                display: none;
-            }
-            .tab {
-                padding: 0.5rem 0.85rem;
-                font-size: 0.78rem;
-                white-space: nowrap;
-                flex-shrink: 0;
-            }
-            .card {
-                padding: 1.15rem;
-            }
-            .card h2 {
-                font-size: 1.05rem;
-            }
-            .two-col {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.65rem;
-            }
-            .stat-box {
-                padding: 0.9rem 0.6rem;
-            }
-            .stat-box .value {
-                font-size: 1.3rem;
-            }
-            .stat-box .label {
-                font-size: 0.7rem;
-            }
-            /* Tables scroll horizontally on mobile */
-            .card {
-                overflow-x: auto;
-            }
-            table {
-                font-size: 0.8rem;
-                min-width: 520px;
-            }
-            th, td {
-                padding: 0.6rem 0.45rem;
-            }
-            .squad-detail {
-                padding: 0.95rem 1rem;
-            }
-            .squad-detail h4 {
-                font-size: 0.9rem;
-            }
-            .squad-detail p {
-                font-size: 0.8rem;
-            }
-            .chart-container {
-                height: 240px;
-            }
-            .insight-box {
-                padding: 0.85rem 1rem;
-            }
-            .insight-box h4 {
-                font-size: 0.9rem;
-            }
-            .insight-box p {
-                font-size: 0.82rem;
-            }
-            .footer {
-                font-size: 0.75rem;
-                padding: 1.4rem 0.75rem;
-            }
+            .tabs::-webkit-scrollbar { display: none; }
+            .tab { padding: 0.5rem 0.85rem; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
+            .card { padding: 1.15rem; overflow-x: auto; }
+            .card h2 { font-size: 1.05rem; }
+            .two-col { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
+            .stat-box { padding: 0.9rem 0.6rem; }
+            .stat-box .value { font-size: 1.3rem; }
+            .stat-box .label { font-size: 0.7rem; }
+            table { font-size: 0.8rem; min-width: 520px; }
+            th, td { padding: 0.6rem 0.45rem; }
+            .squad-detail { padding: 0.95rem 1rem; }
+            .squad-detail h4 { font-size: 0.9rem; }
+            .squad-detail p { font-size: 0.8rem; }
+            .chart-container { height: 240px; }
+            .insight-box { padding: 0.85rem 1rem; }
+            .insight-box h4 { font-size: 0.9rem; }
+            .insight-box p { font-size: 0.82rem; }
+            .footer { font-size: 0.75rem; padding: 1.4rem 0.75rem; }
         }
-
         @media (max-width: 420px) {
-            .header h1 {
-                font-size: 1.25rem;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .filter-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .tab {
-                padding: 0.45rem 0.7rem;
-                font-size: 0.75rem;
-            }
+            .header h1 { font-size: 1.25rem; }
+            .filter-bar { flex-direction: column; align-items: flex-start; }
+            .tab { padding: 0.45rem 0.7rem; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -362,7 +280,7 @@
                     <option value="1" selected>Gameweek 1</option>
                 </select>
             </div>
-            <div class="last-update">Data per 23 Aug 2026 · 22:13 UTC</div>
+            <div class="last-update">Data per 24 Aug 2026 · 21:33 UTC</div>
         </div>
 
         <div class="tabs">
@@ -375,7 +293,6 @@
             <button class="tab" data-tab="insights">Key Insights</button>
         </div>
 
-        <!-- STANDINGS -->
         <div id="standings" class="panel active">
             <div class="card">
                 <h2>Overall Standings <span id="standingsLabel" style="font-weight:500;font-size:0.9rem;color:var(--text-secondary)"></span></h2>
@@ -388,7 +305,6 @@
             </div>
         </div>
 
-        <!-- SQUADS -->
         <div id="squads" class="panel">
             <div class="card">
                 <h2>Squad Analysis <span id="squadsLabel" style="font-weight:500;font-size:0.9rem;color:var(--text-secondary)"></span></h2>
@@ -396,12 +312,10 @@
             </div>
         </div>
 
-        <!-- FORMATIONS -->
         <div id="formations" class="panel">
             <div id="formationsContent"></div>
         </div>
 
-        <!-- WEEKLY (history - always shows all) -->
         <div id="weekly" class="panel">
             <div class="card">
                 <h2>Peringkat Pertama & Terakhir per Gameweek</h2>
@@ -413,7 +327,6 @@
             </div>
         </div>
 
-        <!-- CHIPS (history) -->
         <div id="chips" class="panel">
             <div class="card">
                 <h2>Penggunaan Chips</h2>
@@ -421,7 +334,6 @@
             </div>
         </div>
 
-        <!-- HITS (history) -->
         <div id="hits" class="panel">
             <div class="card">
                 <h2>Transfer Hits</h2>
@@ -430,7 +342,6 @@
             </div>
         </div>
 
-        <!-- INSIGHTS -->
         <div id="insights" class="panel">
             <div class="card">
                 <h2>Key Insights <span id="insightsLabel" style="font-weight:500;font-size:0.9rem;color:var(--text-secondary)"></span></h2>
@@ -445,89 +356,85 @@
     </div>
 
 <script>
-/* ========== DATA STORE (siap multi-GW) ========== */
 const LEAGUE_DATA = {
   1: {
     label: "Gameweek 1",
-    updated: "23 Aug 2026 · 22:13 UTC",
+    updated: "24 Aug 2026 · 21:33 UTC",
     standings: [
-      { rank:1, team:"SCOUSER", manager:"Zava Anbiya", gw:47, total:47, overall:1323493 },
-      { rank:2, team:"sinar muda fc", manager:"Andri Varane", gw:45, total:45, overall:1693842 },
-      { rank:3, team:"Betelguese", manager:"Vikri Nur Rohim", gw:41, total:41, overall:2666208 },
-      { rank:4, team:"King Polenk", manager:"Andre Nosega Purnama", gw:36, total:36, overall:4279248 },
-      { rank:5, team:"Parpas", manager:"Rendy P", gw:33, total:33, overall:5324535 },
-      { rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", gw:28, total:28, overall:6908593 }
+      { rank:1, team:"King Polenk", manager:"Andre Nosega Purnama", gw:66, total:66, overall:893714 },
+      { rank:2, team:"SCOUSER", manager:"Zava Anbiya", gw:58, total:58, overall:2201654 },
+      { rank:3, team:"sinar muda fc", manager:"Andri Varane", gw:56, total:56, overall:2677591 },
+      { rank:4, team:"Betelguese", manager:"Vikri Nur Rohim", gw:52, total:52, overall:3770910 },
+      { rank:5, team:"Parpas", manager:"Rendy P", gw:44, total:44, overall:5282775 },
+      { rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", gw:39, total:39, overall:7295417 }
     ],
-    first: { team:"SCOUSER", manager:"Zava Anbiya", pts:47 },
-    last:  { team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:28 },
+    first: { team:"King Polenk", manager:"Andre Nosega Purnama", pts:66 },
+    last:  { team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:39 },
     chips: [
+      { manager:"Andre Nosega Purnama", team:"King Polenk", chip:null },
       { manager:"Zava Anbiya", team:"SCOUSER", chip:"Bench Boost", note:"Satu-satunya yang aktifkan chip" },
       { manager:"Andri Varane", team:"sinar muda fc", chip:null },
       { manager:"Vikri Nur Rohim", team:"Betelguese", chip:null },
-      { manager:"Andre Nosega Purnama", team:"King Polenk", chip:null },
       { manager:"Rendy P", team:"Parpas", chip:null },
       { manager:"Muhammad Fariz Azhari", team:"Giri - giri", chip:null }
     ],
-    hits: [], // no hits
+    hits: [],
     squads: [
       {
-        rank:1, team:"SCOUSER", manager:"Zava Anbiya", pts:47, form:"3-4-3", chip:"Bench Boost", capt:"Virgil van Dijk",
+        rank:1, team:"King Polenk", manager:"Andre Nosega Purnama", pts:66, form:"4-4-2", chip:null, capt:"João Pedro",
+        gk:"Raya (ARS)", def:"Gabriel (ARS), O'Reilly (MCI), Mosquera (ARS), Ballard (SUN)",
+        mid:"B.Fernandes (MUN) (VC), Rogers (CHE), Dewsbury-Hall (EVE), Le Fée (SUN)",
+        fwd:"João Pedro (CHE) (C), Brobbey (SUN)",
+        clubs:"Arsenal (3), Sunderland (2) · Differential juara GW1"
+      },
+      {
+        rank:2, team:"SCOUSER", manager:"Zava Anbiya", pts:58, form:"3-4-3", chip:"Bench Boost", capt:"Virgil van Dijk",
         gk:"Verbruggen (BHA)", def:"Maguire (MUN), Calafiori (ARS), Virgil (LIV) (C)",
         mid:"Szoboszlai (LIV), B.Fernandes (MUN), Tzolis (ARS), Mbeumo (MUN)",
         fwd:"Isak (LIV), João Pedro (CHE), Calvert-Lewin (LEE)",
         clubs:"Liverpool (3), Man United (3), Arsenal (2)"
       },
       {
-        rank:2, team:"sinar muda fc", manager:"Andri Varane", pts:45, form:"3-4-3", chip:null, capt:"Haaland",
+        rank:3, team:"sinar muda fc", manager:"Andri Varane", pts:56, form:"3-4-3", chip:null, capt:"Haaland",
         gk:"Verbruggen (BHA)", def:"Calafiori (ARS), Muharemović (LEE), Maguire (MUN)",
         mid:"Szoboszlai (LIV), Tzolis (ARS), B.Fernandes (MUN) (VC), Le Fée (SUN)",
         fwd:"Calvert-Lewin (LEE), Haaland (MCI) (C), João Pedro (CHE)",
         clubs:"Arsenal (2), Man United (2), Leeds (2)"
       },
       {
-        rank:3, team:"Betelguese", manager:"Vikri Nur Rohim", pts:41, form:"3-4-3", chip:null, capt:"Haaland",
+        rank:4, team:"Betelguese", manager:"Vikri Nur Rohim", pts:52, form:"3-4-3", chip:null, capt:"Haaland",
         gk:"Verbruggen (BHA)", def:"Gabriel (ARS), Guéhi (MCI), Shaw (MUN)",
         mid:"Rice (ARS), Mbeumo (MUN) (VC), Szoboszlai (LIV), Foden (MCI)",
         fwd:"Calvert-Lewin (LEE), Haaland (MCI) (C), João Pedro (CHE)",
         clubs:"Arsenal (2), Man City (2), Man United (2)"
       },
       {
-        rank:4, team:"King Polenk", manager:"Andre Nosega Purnama", pts:36, form:"4-4-2", chip:null, capt:"João Pedro",
-        gk:"Raya (ARS)", def:"Gabriel (ARS), O'Reilly (MCI), Mosquera (ARS), Ballard (SUN)",
-        mid:"B.Fernandes (MUN) (VC), Rogers (CHE), Dewsbury-Hall (EVE), Le Fée (SUN)",
-        fwd:"João Pedro (CHE) (C), Brobbey (SUN)",
-        clubs:"Arsenal (3), Sunderland (2) · Paling differential"
-      },
-      {
-        rank:5, team:"Parpas", manager:"Rendy P", pts:33, form:"3-5-2", chip:null, capt:"Haaland",
+        rank:5, team:"Parpas", manager:"Rendy P", pts:44, form:"3-5-2", chip:null, capt:"Haaland",
         gk:"Kinsky (TOT)", def:"Gabriel (ARS), Pedro Porro (TOT), Shaw (MUN)",
         mid:"Hughes (CRY), B.Fernandes (MUN) (VC), Szoboszlai (LIV), Mbeumo (MUN), Ndiaye (EVE)",
         fwd:"Haaland (MCI) (C), João Pedro (CHE)",
         clubs:"Man United (3), Tottenham (2)"
       },
       {
-        rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:28, form:"3-4-3", chip:null, capt:"Haaland",
+        rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:39, form:"3-4-3", chip:null, capt:"Haaland",
         gk:"Kinsky (TOT)", def:"Gabriel (ARS), Mitchell (CRY), Shaw (MUN)",
         mid:"B.Fernandes (MUN) (VC), Mbeumo (MUN), Szoboszlai (LIV), Groß (BHA)",
         fwd:"Haaland (MCI) (C), João Pedro (CHE), Calvert-Lewin (LEE)",
-        clubs:"Man United (3) · 18 pts di bangku"
+        clubs:"Man United (3) · Banyak poin di bangku"
       }
     ]
   }
-  // GW2, GW3, ... akan ditambahkan di sini saat update
 };
 
-/* ========== HISTORY HELPERS ========== */
 function getAllGWs() {
   return Object.keys(LEAGUE_DATA).map(Number).sort((a,b) => a-b);
 }
 
 function buildWeeklyHistory() {
-  const rows = getAllGWs().map(gw => {
+  return getAllGWs().map(gw => {
     const d = LEAGUE_DATA[gw];
     return { gw, first: d.first, last: d.last };
   });
-  return rows;
 }
 
 function buildAccum() {
@@ -541,7 +448,6 @@ function buildAccum() {
     managers[fKey].first++;
     managers[lKey].last++;
   });
-  // ensure all current managers appear
   const latest = LEAGUE_DATA[Math.max(...getAllGWs())];
   latest.standings.forEach(s => {
     if (!managers[s.manager]) managers[s.manager] = { manager: s.manager, team: s.team, first:0, last:0 };
@@ -549,7 +455,6 @@ function buildAccum() {
   return Object.values(managers).sort((a,b) => b.first - a.first || a.last - b.last);
 }
 
-/* ========== RENDER ========== */
 let pointsChartInst = null;
 let hitsChartInst = null;
 
@@ -562,7 +467,6 @@ function render(gw) {
   document.getElementById('insightsLabel').textContent = `· ${data.label}`;
   document.querySelector('.last-update').textContent = `Data per ${data.updated}`;
 
-  // Standings table
   let stHtml = `<table><thead><tr><th>Rank</th><th>Team</th><th>Manager</th><th>GW</th><th>Total</th><th>Overall Rank</th></tr></thead><tbody>`;
   data.standings.forEach((r,i) => {
     let cls = i===0 ? 'rank-1' : i<3 ? 'rank-2' : i>=4 ? 'rank-low' : '';
@@ -578,9 +482,9 @@ function render(gw) {
     <div class="stat-box"><div class="value">${Math.max(...pts)}</div><div class="label">Tertinggi</div></div>
     <div class="stat-box"><div class="value">${Math.min(...pts)}</div><div class="label">Terendah</div></div>
     <div class="stat-box"><div class="value">${Math.max(...pts)-Math.min(...pts)}</div><div class="label">Rentang</div></div>
+    <div class="stat-box"><div class="value">~48</div><div class="label">Avg Global</div></div>
     <div class="stat-box"><div class="value">${data.standings.length}</div><div class="label">Jumlah Tim</div></div>`;
 
-  // Points chart
   if (pointsChartInst) pointsChartInst.destroy();
   pointsChartInst = new Chart(document.getElementById('pointsChart'), {
     type: 'bar',
@@ -597,10 +501,9 @@ function render(gw) {
     }
   });
 
-  // Squads
   let sqHtml = '';
   data.squads.forEach(s => {
-    const ptsBadge = s.pts >= 45 ? 'badge-green' : s.pts >= 40 ? 'badge-blue' : s.pts >= 35 ? 'badge-yellow' : 'badge-red';
+    const ptsBadge = s.pts >= 60 ? 'badge-green' : s.pts >= 50 ? 'badge-blue' : s.pts >= 40 ? 'badge-yellow' : 'badge-red';
     sqHtml += `<div class="squad-detail">
       <h4>${s.rank}. ${s.team} — ${s.manager} <span class="badge ${ptsBadge}">${s.pts} pts</span></h4>
       <div class="meta">Formasi <span class="badge badge-green">${s.form}</span>
@@ -615,7 +518,6 @@ function render(gw) {
   });
   document.getElementById('squadsContent').innerHTML = sqHtml;
 
-  // Formations (simple summary for selected GW)
   const formCount = {};
   data.squads.forEach(s => { formCount[s.form] = (formCount[s.form]||0)+1; });
   let formHtml = `<div class="two-col"><div class="card"><h2>Distribusi Formasi</h2><table><thead><tr><th>Formasi</th><th>Jumlah</th></tr></thead><tbody>`;
@@ -632,7 +534,6 @@ function render(gw) {
   formHtml += `</tbody></table></div></div>`;
   document.getElementById('formationsContent').innerHTML = formHtml;
 
-  // Weekly history (all GWs)
   const hist = buildWeeklyHistory();
   let wHtml = `<table><thead><tr><th>Gameweek</th><th>Peringkat Pertama</th><th>Peringkat Terakhir</th></tr></thead><tbody>`;
   hist.forEach(h => {
@@ -660,7 +561,6 @@ function render(gw) {
   aHtml += `</tbody></table>`;
   document.getElementById('weeklyAccum').innerHTML = aHtml;
 
-  // Chips (show selected GW + note about history)
   let cHtml = `<table><thead><tr><th>Manager</th><th>Team</th><th>Chip</th><th>Keterangan</th></tr></thead><tbody>`;
   data.chips.forEach(c => {
     cHtml += `<tr class="${c.chip?'rank-1':''}">
@@ -672,7 +572,6 @@ function render(gw) {
   cHtml += `</tbody></table>`;
   document.getElementById('chipsContent').innerHTML = cHtml;
 
-  // Hits
   let hHtml = `<table><thead><tr><th>Gameweek</th><th>Manager yang Kena Hit</th><th>Total Potongan</th></tr></thead><tbody>`;
   getAllGWs().forEach(g => {
     const d = LEAGUE_DATA[g];
@@ -686,7 +585,6 @@ function render(gw) {
   hHtml += `</tbody></table>`;
   document.getElementById('hitsContent').innerHTML = hHtml;
 
-  // Hits chart (accum per manager - currently all 0)
   const hitByManager = {};
   getAllGWs().forEach(g => {
     LEAGUE_DATA[g].hits.forEach(h => {
@@ -708,17 +606,19 @@ function render(gw) {
     }
   });
 
-  // Insights
   document.getElementById('insightsContent').innerHTML = `
-    <div class="insight-box"><h4>1. Performa ${data.label}</h4>
-      <p>Rata-rata poin liga: <strong>${avg}</strong>. Tertinggi: <strong>${data.first.team}</strong> (${data.first.pts} pts). Terendah: <strong>${data.last.team}</strong> (${data.last.pts} pts).</p></div>
-    <div class="insight-box"><h4>2. Formasi Dominan</h4>
-      <p>Formasi paling banyak dipakai pada ${data.label}: <strong>${Object.entries(formCount).sort((a,b)=>b[1]-a[1])[0][0]}</strong>.</p></div>
-    <div class="insight-box"><h4>3. Catatan</h4>
-      <p>Gunakan filter Gameweek di atas untuk melihat detail Standings, Squad, Formasi, dan Insights per minggu. Tab Peringkat Mingguan, Chips, dan Transfer Hits menampilkan riwayat seluruh musim.</p></div>`;
+    <div class="insight-box"><h4>1. Kejutan GW1 — King Polenk Juara</h4>
+      <p><strong>King Polenk</strong> (Andre Nosega Purnama) finis di puncak dengan <strong>66 poin</strong>. Skuad differential + captain João Pedro membayar tuntas. Dari rank 4 di snapshot awal → rank 1 final.</p></div>
+    <div class="insight-box"><h4>2. Bench Boost SCOUSER tidak cukup</h4>
+      <p>SCOUSER (Zava Anbiya) memakai Bench Boost dan finis rank 2 dengan 58 poin. Masih kalah dari differential King Polenk.</p></div>
+    <div class="insight-box"><h4>3. Formasi & Captain</h4>
+      <p>3-4-3 masih paling populer (4/6). Haaland captain favorit (4 manajer), tapi juara mingguan justru captain João Pedro.</p></div>
+    <div class="insight-box"><h4>4. Rata-rata Liga vs Global</h4>
+      <p>Rata-rata liga <strong>${avg}</strong> poin vs rata-rata global ~48. Semua manajer kecuali 2 terbawah masih kompetitif.</p></div>
+    <div class="insight-box"><h4>5. Catatan</h4>
+      <p>Gunakan filter Gameweek untuk melihat detail per minggu. Tab Peringkat Mingguan, Chips, dan Transfer Hits menampilkan riwayat seluruh musim.</p></div>`;
 }
 
-/* ========== INIT ========== */
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -729,7 +629,6 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 const select = document.getElementById('gwSelect');
-// populate from data
 select.innerHTML = '';
 getAllGWs().reverse().forEach(gw => {
   const opt = document.createElement('option');
