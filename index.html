@@ -300,8 +300,9 @@
                 <div class="stats-grid" id="standingsStats"></div>
             </div>
             <div class="card">
-                <h2>Distribusi Poin</h2>
-                <div class="chart-container"><canvas id="pointsChart"></canvas></div>
+                <h2>Akumulasi Poin Sepanjang Musim</h2>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin:-0.5rem 0 1rem;">Total poin kumulatif tiap manajer per gameweek</p>
+                <div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
             </div>
         </div>
 
@@ -485,19 +486,65 @@ function render(gw) {
     <div class="stat-box"><div class="value">~48</div><div class="label">Avg Global</div></div>
     <div class="stat-box"><div class="value">${data.standings.length}</div><div class="label">Jumlah Tim</div></div>`;
 
+  // Cumulative line chart across all GWs
   if (pointsChartInst) pointsChartInst.destroy();
+  const allGWs = getAllGWs();
+  const teamOrder = LEAGUE_DATA[Math.max(...allGWs)].standings.map(s => s.team);
+  const colors = ['#059669','#2563EB','#7C3AED','#D97706','#DC2626','#0891B2'];
+  // Start from 0 so the line shows a rise into GW1
+  const labels = ['Start'].concat(allGWs.map(g => 'GW' + g));
+  const datasets = teamOrder.map((team, idx) => {
+    let running = 0;
+    const points = [0]; // starting point
+    allGWs.forEach(g => {
+      const row = LEAGUE_DATA[g].standings.find(s => s.team === team);
+      running = row ? row.total : running;
+      points.push(running);
+    });
+    return {
+      label: team,
+      data: points,
+      borderColor: colors[idx % colors.length],
+      backgroundColor: colors[idx % colors.length] + '22',
+      borderWidth: 2.5,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      tension: 0.25,
+      fill: false
+    };
+  });
   pointsChartInst = new Chart(document.getElementById('pointsChart'), {
-    type: 'bar',
+    type: 'line',
     data: {
-      labels: data.standings.map(s => s.team),
-      datasets: [{ data: data.standings.map(s => s.gw),
-        backgroundColor: data.standings.map((_,i) => i===0?'#059669':i<3?'#2563EB':'#D97706'),
-        borderRadius: 6, borderSkipped: false }]
+      labels: labels,
+      datasets: datasets
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, grid: { color: '#E2E8F0' } }, x: { grid: { display: false } } }
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 12 }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.dataset.label + ': ' + ctx.parsed.y + ' pts'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Total Poin', font: { family: 'Inter', size: 12 } },
+          grid: { color: '#E2E8F0' }
+        },
+        x: {
+          title: { display: true, text: 'Gameweek', font: { family: 'Inter', size: 12 } },
+          grid: { display: false }
+        }
+      }
     }
   });
 
