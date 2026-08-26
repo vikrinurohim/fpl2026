@@ -304,6 +304,16 @@
                 <p style="font-size:0.85rem;color:var(--text-secondary);margin:-0.5rem 0 1rem;">Total poin kumulatif tiap manajer per gameweek</p>
                 <div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
             </div>
+            <div class="card">
+                <h2>Klub Favorit per Manager</h2>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin:-0.5rem 0 1rem;">Akumulasi jumlah pemain per klub di Starting XI (seluruh musim)</p>
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <label for="managerClubSelect" style="font-weight:600;font-size:0.875rem;color:var(--text-secondary);">Manager</label>
+                    <select id="managerClubSelect" style="padding:0.5rem 1rem;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-family:inherit;background:#F8FAFC;min-width:200px;"></select>
+                </div>
+                <div class="chart-container" style="height:300px"><canvas id="clubChart"></canvas></div>
+                <p style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem;font-style:italic;">* Hanya Starting XI (line-up), tidak termasuk bench</p>
+            </div>
         </div>
 
         <div id="squads" class="panel">
@@ -386,42 +396,48 @@ const LEAGUE_DATA = {
         gk:"Raya (ARS)", def:"Gabriel (ARS), O'Reilly (MCI), Mosquera (ARS), Ballard (SUN)",
         mid:"B.Fernandes (MUN) (VC), Rogers (CHE), Dewsbury-Hall (EVE), Le Fée (SUN)",
         fwd:"João Pedro (CHE) (C), Brobbey (SUN)",
-        clubs:"Arsenal (3), Sunderland (2) · Differential juara GW1"
+        clubs:"Arsenal (3), Sunderland (2) · Differential juara GW1",
+        clubCounts: {"ARS":3,"MCI":1,"SUN":2,"MUN":1,"CHE":2,"EVE":1}
       },
       {
         rank:2, team:"SCOUSER", manager:"Zava Anbiya", pts:58, form:"3-4-3", chip:"Bench Boost", capt:"Virgil van Dijk",
         gk:"Verbruggen (BHA)", def:"Maguire (MUN), Calafiori (ARS), Virgil (LIV) (C)",
         mid:"Szoboszlai (LIV), B.Fernandes (MUN), Tzolis (ARS), Mbeumo (MUN)",
         fwd:"Isak (LIV), João Pedro (CHE), Calvert-Lewin (LEE)",
-        clubs:"Liverpool (3), Man United (3), Arsenal (2)"
+        clubs:"Liverpool (3), Man United (3), Arsenal (2)",
+        clubCounts: {"BHA":1,"MUN":3,"ARS":2,"LIV":3,"CHE":1,"LEE":1}
       },
       {
         rank:3, team:"sinar muda fc", manager:"Andri Varane", pts:56, form:"3-4-3", chip:null, capt:"Haaland",
         gk:"Verbruggen (BHA)", def:"Calafiori (ARS), Muharemović (LEE), Maguire (MUN)",
         mid:"Szoboszlai (LIV), Tzolis (ARS), B.Fernandes (MUN) (VC), Le Fée (SUN)",
         fwd:"Calvert-Lewin (LEE), Haaland (MCI) (C), João Pedro (CHE)",
-        clubs:"Arsenal (2), Man United (2), Leeds (2)"
+        clubs:"Arsenal (2), Man United (2), Leeds (2)",
+        clubCounts: {"BHA":1,"ARS":2,"LEE":2,"MUN":2,"LIV":1,"SUN":1,"MCI":1,"CHE":1}
       },
       {
         rank:4, team:"Betelguese", manager:"Vikri Nur Rohim", pts:52, form:"3-4-3", chip:null, capt:"Haaland",
         gk:"Verbruggen (BHA)", def:"Gabriel (ARS), Guéhi (MCI), Shaw (MUN)",
         mid:"Rice (ARS), Mbeumo (MUN) (VC), Szoboszlai (LIV), Foden (MCI)",
         fwd:"Calvert-Lewin (LEE), Haaland (MCI) (C), João Pedro (CHE)",
-        clubs:"Arsenal (2), Man City (2), Man United (2)"
+        clubs:"Arsenal (2), Man City (2), Man United (2)",
+        clubCounts: {"BHA":1,"ARS":2,"MCI":3,"MUN":2,"LIV":1,"LEE":1,"CHE":1}
       },
       {
         rank:5, team:"Parpas", manager:"Rendy P", pts:44, form:"3-5-2", chip:null, capt:"Haaland",
         gk:"Kinsky (TOT)", def:"Gabriel (ARS), Pedro Porro (TOT), Shaw (MUN)",
         mid:"Hughes (CRY), B.Fernandes (MUN) (VC), Szoboszlai (LIV), Mbeumo (MUN), Ndiaye (EVE)",
         fwd:"Haaland (MCI) (C), João Pedro (CHE)",
-        clubs:"Man United (3), Tottenham (2)"
+        clubs:"Man United (3), Tottenham (2)",
+        clubCounts: {"TOT":2,"ARS":1,"MUN":3,"CRY":1,"LIV":1,"EVE":1,"MCI":1,"CHE":1}
       },
       {
         rank:6, team:"Giri - giri", manager:"Muhammad Fariz Azhari", pts:39, form:"3-4-3", chip:null, capt:"Haaland",
         gk:"Kinsky (TOT)", def:"Gabriel (ARS), Mitchell (CRY), Shaw (MUN)",
         mid:"B.Fernandes (MUN) (VC), Mbeumo (MUN), Szoboszlai (LIV), Groß (BHA)",
         fwd:"Haaland (MCI) (C), João Pedro (CHE), Calvert-Lewin (LEE)",
-        clubs:"Man United (3) · Banyak poin di bangku"
+        clubs:"Man United (3) · Banyak poin di bangku",
+        clubCounts: {"TOT":1,"ARS":1,"CRY":1,"MUN":3,"LIV":1,"BHA":1,"MCI":1,"CHE":1,"LEE":1}
       }
     ]
   }
@@ -456,8 +472,67 @@ function buildAccum() {
   return Object.values(managers).sort((a,b) => b.first - a.first || a.last - b.last);
 }
 
+function getManagerList() {
+  const latest = LEAGUE_DATA[Math.max(...getAllGWs())];
+  return latest.standings.map(s => ({ manager: s.manager, team: s.team }));
+}
+
+function getCumulativeClubCounts(managerName) {
+  const totals = {};
+  getAllGWs().forEach(gw => {
+    const squad = LEAGUE_DATA[gw].squads.find(s => s.manager === managerName);
+    if (!squad || !squad.clubCounts) return;
+    Object.entries(squad.clubCounts).forEach(([club, n]) => {
+      totals[club] = (totals[club] || 0) + n;
+    });
+  });
+  return Object.entries(totals).sort((a,b) => b[1] - a[1]);
+}
+
+function renderClubChart(managerName) {
+  const entries = getCumulativeClubCounts(managerName);
+  const labels = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  if (clubChartInst) clubChartInst.destroy();
+  clubChartInst = new Chart(document.getElementById('clubChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Jumlah pemain',
+        data: values,
+        backgroundColor: '#2563EB',
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' pemain' } }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1 },
+          title: { display: true, text: 'Jumlah Pemain', font: { family: 'Inter', size: 12 } },
+          grid: { color: '#E2E8F0' }
+        },
+        x: {
+          title: { display: true, text: 'Klub', font: { family: 'Inter', size: 12 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+
 let pointsChartInst = null;
 let hitsChartInst = null;
+let clubChartInst = null;
 
 function render(gw) {
   const data = LEAGUE_DATA[gw];
@@ -664,6 +739,24 @@ function render(gw) {
       <p>Rata-rata liga <strong>${avg}</strong> poin vs rata-rata global ~48. Semua manajer kecuali 2 terbawah masih kompetitif.</p></div>
     <div class="insight-box"><h4>5. Catatan</h4>
       <p>Gunakan filter Gameweek untuk melihat detail per minggu. Tab Peringkat Mingguan, Chips, dan Transfer Hits menampilkan riwayat seluruh musim.</p></div>`;
+
+  // Populate manager club filter (once / refresh)
+  const mgrSelect = document.getElementById('managerClubSelect');
+  if (mgrSelect && mgrSelect.options.length === 0) {
+    getManagerList().forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.manager;
+      opt.textContent = m.manager + ' (' + m.team + ')';
+      mgrSelect.appendChild(opt);
+    });
+    mgrSelect.addEventListener('change', () => renderClubChart(mgrSelect.value));
+  }
+  if (mgrSelect && mgrSelect.value) {
+    renderClubChart(mgrSelect.value);
+  } else if (mgrSelect && mgrSelect.options.length) {
+    mgrSelect.selectedIndex = 0;
+    renderClubChart(mgrSelect.value);
+  }
 }
 
 document.querySelectorAll('.tab').forEach(tab => {
