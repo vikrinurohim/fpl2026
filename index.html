@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <style>
 :root {
   --fpl-purple: #37003C;
@@ -140,8 +141,16 @@ tr:hover td{background:rgba(0,255,135,0.04)}
       <div class="stats-grid" id="standingsStats"></div>
     </div>
     <div class="card">
-      <h2>Akumulasi Poin Sepanjang Musim</h2>
-      <p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Total poin kumulatif tiap manajer per gameweek</p>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem">
+        <h2 style="margin:0;padding:0;border:none">Akumulasi Poin Sepanjang Musim</h2>
+        <button type="button" id="btnPdfPoints" style="
+          background:linear-gradient(135deg,#00FF87,#00D9A0);color:#0A0A0A;border:none;border-radius:999px;
+          padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;
+          box-shadow:0 2px 12px rgba(0,255,135,0.3);white-space:nowrap">
+          Download PDF (A4)
+        </button>
+      </div>
+      <p style="font-size:0.8rem;color:var(--muted);margin:0 0 1rem">Total poin kumulatif tiap manajer per gameweek</p>
       <div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
     </div>
     <div class="card">
@@ -352,7 +361,7 @@ function render(gw){
   if(pointsChartInst)pointsChartInst.destroy();
   const allGWs=getAllGWs();
   const teamOrder=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
-  const colors=['#00FF87','#04F5FF','#E90052','#FFC107','#A78BFA','#FB923C','#F472B6'];
+  const colors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];
   const labels=['Start'].concat(allGWs.map(g=>'GW'+g));
   const datasets=teamOrder.map((team,idx)=>{
     let running=0;const points=[0];
@@ -368,7 +377,7 @@ function render(gw){
 
   const benchTotals=getAccumBench();
   const benchTeams=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
-  const benchColors=['#00FF87','#04F5FF','#E90052','#FFC107','#A78BFA','#FB923C','#F472B6'];
+  const benchColors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];
   if(benchChartInst)benchChartInst.destroy();
   benchChartInst=new Chart(document.getElementById('benchChart'),{
     type:'bar',
@@ -503,6 +512,58 @@ getAllGWs().reverse().forEach(gw=>{
   select.appendChild(opt);
 });
 select.addEventListener('change',()=>render(parseInt(select.value)));
+
+function downloadPointsChartPDF(){
+  if(!pointsChartInst){alert('Chart belum siap');return}
+  const { jsPDF } = window.jspdf;
+  // A4 landscape: 297mm x 210mm — white background, only chart is colored
+  const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const pageW = 297, pageH = 210;
+  const margin = 14;
+  const contentW = pageW - margin*2;
+
+  // White page
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(0, 0, pageW, pageH, 'F');
+
+  // Title (dark text)
+  pdf.setTextColor(15, 23, 42);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(14);
+  pdf.text('QA Nippon Paint — Akumulasi Poin Sepanjang Musim', margin, 14);
+
+  pdf.setTextColor(100, 116, 139);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(9);
+  const gwLabel = document.getElementById('gwSelect')?.selectedOptions?.[0]?.text || '';
+  pdf.text('Fantasy Premier League · League 1331564 · ' + gwLabel, margin, 20);
+
+  // Thin divider
+  pdf.setDrawColor(226, 232, 240);
+  pdf.setLineWidth(0.3);
+  pdf.line(margin, 24, pageW - margin, 24);
+
+  // Export chart with white background for print
+  const prevBg = pointsChartInst.options.plugins?.legend;
+  const img = pointsChartInst.toBase64Image('image/png', 1.0);
+
+  const chartTop = 28;
+  const chartH = pageH - chartTop - margin - 6;
+  const chartW = contentW;
+  pdf.addImage(img, 'PNG', margin, chartTop, chartW, chartH);
+
+  // Footer
+  pdf.setFontSize(8);
+  pdf.setTextColor(148, 163, 184);
+  pdf.text('QA Nippon Paint League Analysis', margin, pageH - 6);
+  pdf.text(new Date().toISOString().slice(0,10), pageW - margin - 22, pageH - 6);
+
+  pdf.save('QA-Nippon-Paint-Akumulasi-Poin.pdf');
+}
+
+document.getElementById('btnPdfPoints')?.addEventListener('click', downloadPointsChartPDF);
+
+
 render(Math.max(...getAllGWs()));
 </script>
 </body>
