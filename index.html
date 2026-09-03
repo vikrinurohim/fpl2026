@@ -127,7 +127,7 @@ tr:hover td{background:rgba(0,255,135,0.04)}
   <div class="tabs">
     <button class="tab active" data-tab="standings">Standings</button>
     <button class="tab" data-tab="squads">Squad Analysis</button>
-    <button class="tab" data-tab="formations">Formasi & Klub</button>
+    <button class="tab" data-tab="formations">Formasi &amp; Klub</button>
     <button class="tab" data-tab="weekly">Peringkat Mingguan</button>
     <button class="tab" data-tab="chips">Chips</button>
     <button class="tab" data-tab="hits">Transfer Hits</button>
@@ -179,7 +179,7 @@ tr:hover td{background:rgba(0,255,135,0.04)}
   </div>
   <div id="formations" class="panel"><div id="formationsContent"></div></div>
   <div id="weekly" class="panel">
-    <div class="card"><h2>Peringkat Pertama & Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
+    <div class="card"><h2>Peringkat Pertama &amp; Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
     <div class="card"><h2>Akumulasi Sepanjang Musim</h2><div id="weeklyAccum"></div></div>
   </div>
   <div id="chips" class="panel"><div class="card"><h2>Penggunaan Chips</h2><div id="chipsContent"></div></div></div>
@@ -205,6 +205,22 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 Chart.defaults.color='#C4B5C8';
 Chart.defaults.borderColor='rgba(255,255,255,0.08)';
 Chart.defaults.font.family='Inter';
+
+// Plugin: paints a solid background behind the chart. Only applied when a
+// chart's own options.plugins.customCanvasBackgroundColor.color is set, so
+// it has zero effect on the normal dark-theme charts.
+Chart.register({
+  id:'customCanvasBackgroundColor',
+  beforeDraw:(chart,args,options)=>{
+    if(!options.color)return;
+    const{ctx}=chart;
+    ctx.save();
+    ctx.globalCompositeOperation='destination-over';
+    ctx.fillStyle=options.color;
+    ctx.fillRect(0,0,chart.width,chart.height);
+    ctx.restore();
+  }
+});
 
 const LEAGUE_DATA={
 1:{
@@ -489,7 +505,7 @@ function render(gw){
       <p><strong>King Polenk</strong> puncak dengan 66 poin lewat differential + captain João Pedro.</p></div>
     <div class="insight-box"><h4>2. Bench Boost SCOUSER</h4>
       <p>SCOUSER memakai Bench Boost, finis rank 2 (58 pts).</p></div>
-    <div class="insight-box"><h4>3. Formasi & Captain</h4>
+    <div class="insight-box"><h4>3. Formasi &amp; Captain</h4>
       <p>3-4-3 paling populer. Haaland captain favorit, juara mingguan captain João Pedro.</p></div>
     <div class="insight-box"><h4>4. Catatan</h4>
       <p>Gunakan filter Gameweek untuk detail per minggu.</p></div>`;
@@ -520,52 +536,79 @@ function downloadPointsChartPDF(){
   const pageW = 297, pageH = 210;
   const margin = 14;
   const contentW = pageW - margin*2;
+  const chartTop = 28;
+  const chartH = pageH - chartTop - margin - 6;
 
-  // Snapshot current chart options to restore after export
-  const chart = pointsChartInst;
-  const saved = {
-    bg: chart.options.backgroundColor,
-    legendColor: chart.options.plugins?.legend?.labels?.color,
-    titleColor: chart.options.plugins?.title?.color,
-    xGrid: chart.options.scales?.x?.grid?.color,
-    yGrid: chart.options.scales?.y?.grid?.color,
-    xTick: chart.options.scales?.x?.ticks?.color,
-    yTick: chart.options.scales?.y?.ticks?.color,
-    xTitle: chart.options.scales?.x?.title?.color,
-    yTitle: chart.options.scales?.y?.title?.color,
-  };
+  // Build a separate, offscreen chart just for the export instead of
+  // reskinning the live one. This is what actually gives us:
+  //  1) a real white background (via the customCanvasBackgroundColor
+  //     plugin — the old code set chart.options.backgroundColor, which
+  //     isn't a real Chart.js option and never painted anything)
+  //  2) a crisp, non-blurry image — we render at a fixed high pixel
+  //     resolution and devicePixelRatio, then let jsPDF scale it down
+  //     into the page slot, instead of upscaling a small on-screen canvas
+  //  3) no flicker on the visible dashboard, since the real chart is
+  //     never touched
+  const exportWidthPx = 1600;
+  const exportHeightPx = Math.round(exportWidthPx * (chartH / contentW));
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = exportWidthPx;
+  tempCanvas.height = exportHeightPx;
+  tempCanvas.style.position = 'fixed';
+  tempCanvas.style.left = '-99999px';
+  tempCanvas.style.top = '0';
+  document.body.appendChild(tempCanvas);
 
-  // Force light theme for print
-  chart.options.backgroundColor = '#FFFFFF';
-  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = '#0F172A';
-  if(chart.options.scales?.x){
-    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = 'rgba(15,23,42,0.08)';
-    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = '#475569';
-    if(chart.options.scales.x.title) chart.options.scales.x.title.color = '#334155';
-  }
-  if(chart.options.scales?.y){
-    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = 'rgba(15,23,42,0.08)';
-    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = '#475569';
-    if(chart.options.scales.y.title) chart.options.scales.y.title.color = '#334155';
-  }
-  chart.update('none');
+  const srcData = pointsChartInst.config.data;
+  const exportChart = new Chart(tempCanvas, {
+    type: 'line',
+    data: {
+      labels: srcData.labels,
+      datasets: srcData.datasets.map(ds => ({
+        label: ds.label,
+        data: ds.data,
+        borderColor: ds.borderColor,
+        backgroundColor: ds.backgroundColor,
+        borderWidth: 3,
+        pointRadius: 5,
+        pointHoverRadius: 6,
+        pointBackgroundColor: ds.borderColor,
+        tension: ds.tension,
+        fill: false
+      }))
+    },
+    options: {
+      responsive: false,
+      animation: false,
+      devicePixelRatio: 2,
+      layout: { padding: 10 },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#0F172A', font: { family: 'Inter', size: 18 }, boxWidth: 18, padding: 16 }
+        },
+        tooltip: { enabled: false },
+        customCanvasBackgroundColor: { color: '#FFFFFF' }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Total Poin', color: '#334155', font: { size: 15 } },
+          ticks: { color: '#475569', font: { size: 13 } },
+          grid: { color: 'rgba(15,23,42,0.08)' }
+        },
+        x: {
+          title: { display: true, text: 'Gameweek', color: '#334155', font: { size: 15 } },
+          ticks: { color: '#475569', font: { size: 13 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
 
-  const img = chart.toBase64Image('image/png', 1.0);
-
-  // Restore dark theme
-  chart.options.backgroundColor = saved.bg;
-  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = saved.legendColor;
-  if(chart.options.scales?.x){
-    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = saved.xGrid;
-    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = saved.xTick;
-    if(chart.options.scales.x.title) chart.options.scales.x.title.color = saved.xTitle;
-  }
-  if(chart.options.scales?.y){
-    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = saved.yGrid;
-    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = saved.yTick;
-    if(chart.options.scales.y.title) chart.options.scales.y.title.color = saved.yTitle;
-  }
-  chart.update('none');
+  const img = exportChart.toBase64Image('image/png', 1.0);
+  exportChart.destroy();
+  document.body.removeChild(tempCanvas);
 
   // White page
   pdf.setFillColor(255, 255, 255);
@@ -586,8 +629,6 @@ function downloadPointsChartPDF(){
   pdf.setLineWidth(0.3);
   pdf.line(margin, 24, pageW - margin, 24);
 
-  const chartTop = 28;
-  const chartH = pageH - chartTop - margin - 6;
   pdf.addImage(img, 'PNG', margin, chartTop, contentW, chartH);
 
   pdf.setFontSize(8);
