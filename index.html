@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -516,17 +517,61 @@ select.addEventListener('change',()=>render(parseInt(select.value)));
 function downloadPointsChartPDF(){
   if(!pointsChartInst){alert('Chart belum siap');return}
   const { jsPDF } = window.jspdf;
-  // A4 landscape: 297mm x 210mm — white background, only chart is colored
   const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
   const pageW = 297, pageH = 210;
   const margin = 14;
   const contentW = pageW - margin*2;
 
+  // Snapshot current chart options to restore after export
+  const chart = pointsChartInst;
+  const saved = {
+    bg: chart.options.backgroundColor,
+    legendColor: chart.options.plugins?.legend?.labels?.color,
+    titleColor: chart.options.plugins?.title?.color,
+    xGrid: chart.options.scales?.x?.grid?.color,
+    yGrid: chart.options.scales?.y?.grid?.color,
+    xTick: chart.options.scales?.x?.ticks?.color,
+    yTick: chart.options.scales?.y?.ticks?.color,
+    xTitle: chart.options.scales?.x?.title?.color,
+    yTitle: chart.options.scales?.y?.title?.color,
+  };
+
+  // Force light theme for print
+  chart.options.backgroundColor = '#FFFFFF';
+  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = '#0F172A';
+  if(chart.options.scales?.x){
+    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = 'rgba(15,23,42,0.08)';
+    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = '#475569';
+    if(chart.options.scales.x.title) chart.options.scales.x.title.color = '#334155';
+  }
+  if(chart.options.scales?.y){
+    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = 'rgba(15,23,42,0.08)';
+    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = '#475569';
+    if(chart.options.scales.y.title) chart.options.scales.y.title.color = '#334155';
+  }
+  chart.update('none');
+
+  const img = chart.toBase64Image('image/png', 1.0);
+
+  // Restore dark theme
+  chart.options.backgroundColor = saved.bg;
+  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = saved.legendColor;
+  if(chart.options.scales?.x){
+    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = saved.xGrid;
+    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = saved.xTick;
+    if(chart.options.scales.x.title) chart.options.scales.x.title.color = saved.xTitle;
+  }
+  if(chart.options.scales?.y){
+    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = saved.yGrid;
+    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = saved.yTick;
+    if(chart.options.scales.y.title) chart.options.scales.y.title.color = saved.yTitle;
+  }
+  chart.update('none');
+
   // White page
   pdf.setFillColor(255, 255, 255);
   pdf.rect(0, 0, pageW, pageH, 'F');
 
-  // Title (dark text)
   pdf.setTextColor(15, 23, 42);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
@@ -538,21 +583,14 @@ function downloadPointsChartPDF(){
   const gwLabel = document.getElementById('gwSelect')?.selectedOptions?.[0]?.text || '';
   pdf.text('Fantasy Premier League · League 1331564 · ' + gwLabel, margin, 20);
 
-  // Thin divider
   pdf.setDrawColor(226, 232, 240);
   pdf.setLineWidth(0.3);
   pdf.line(margin, 24, pageW - margin, 24);
 
-  // Export chart with white background for print
-  const prevBg = pointsChartInst.options.plugins?.legend;
-  const img = pointsChartInst.toBase64Image('image/png', 1.0);
-
   const chartTop = 28;
   const chartH = pageH - chartTop - margin - 6;
-  const chartW = contentW;
-  pdf.addImage(img, 'PNG', margin, chartTop, chartW, chartH);
+  pdf.addImage(img, 'PNG', margin, chartTop, contentW, chartH);
 
-  // Footer
   pdf.setFontSize(8);
   pdf.setTextColor(148, 163, 184);
   pdf.text('QA Nippon Paint League Analysis', margin, pageH - 6);
