@@ -127,7 +127,7 @@ tr:hover td{background:rgba(0,255,135,0.04)}
   <div class="tabs">
     <button class="tab active" data-tab="standings">Standings</button>
     <button class="tab" data-tab="squads">Squad Analysis</button>
-    <button class="tab" data-tab="formations">Formasi &amp; Klub</button>
+    <button class="tab" data-tab="formations">Formasi & Klub</button>
     <button class="tab" data-tab="weekly">Peringkat Mingguan</button>
     <button class="tab" data-tab="chips">Chips</button>
     <button class="tab" data-tab="hits">Transfer Hits</button>
@@ -143,12 +143,19 @@ tr:hover td{background:rgba(0,255,135,0.04)}
     <div class="card">
       <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem">
         <h2 style="margin:0;padding:0;border:none">Akumulasi Poin Sepanjang Musim</h2>
-        <button type="button" id="btnPdfPoints" style="
-          background:linear-gradient(135deg,#00FF87,#00D9A0);color:#0A0A0A;border:none;border-radius:999px;
-          padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;
-          box-shadow:0 2px 12px rgba(0,255,135,0.3);white-space:nowrap">
-          Download PDF (A4)
-        </button>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button type="button" id="btnAnimPoints" style="
+            background:transparent;color:var(--fpl-green);border:1.5px solid var(--fpl-green);border-radius:999px;
+            padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap">
+            ▶ Putar Animasi
+          </button>
+          <button type="button" id="btnPdfPoints" style="
+            background:linear-gradient(135deg,#00FF87,#00D9A0);color:#0A0A0A;border:none;border-radius:999px;
+            padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;
+            box-shadow:0 2px 12px rgba(0,255,135,0.3);white-space:nowrap">
+            Download PDF (A4)
+          </button>
+        </div>
       </div>
       <p style="font-size:0.8rem;color:var(--muted);margin:0 0 1rem">Total poin kumulatif tiap manajer per gameweek</p>
       <div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
@@ -179,7 +186,7 @@ tr:hover td{background:rgba(0,255,135,0.04)}
   </div>
   <div id="formations" class="panel"><div id="formationsContent"></div></div>
   <div id="weekly" class="panel">
-    <div class="card"><h2>Peringkat Pertama &amp; Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
+    <div class="card"><h2>Peringkat Pertama & Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
     <div class="card"><h2>Akumulasi Sepanjang Musim</h2><div id="weeklyAccum"></div></div>
   </div>
   <div id="chips" class="panel"><div class="card"><h2>Penggunaan Chips</h2><div id="chipsContent"></div></div></div>
@@ -205,22 +212,6 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 Chart.defaults.color='#C4B5C8';
 Chart.defaults.borderColor='rgba(255,255,255,0.08)';
 Chart.defaults.font.family='Inter';
-
-// Plugin: paints a solid background behind the chart. Only applied when a
-// chart's own options.plugins.customCanvasBackgroundColor.color is set, so
-// it has zero effect on the normal dark-theme charts.
-Chart.register({
-  id:'customCanvasBackgroundColor',
-  beforeDraw:(chart,args,options)=>{
-    if(!options.color)return;
-    const{ctx}=chart;
-    ctx.save();
-    ctx.globalCompositeOperation='destination-over';
-    ctx.fillStyle=options.color;
-    ctx.fillRect(0,0,chart.width,chart.height);
-    ctx.restore();
-  }
-});
 
 const LEAGUE_DATA={
 1:{
@@ -325,6 +316,36 @@ function movementHtml(rank,lastRank){
 }
 
 let pointsChartInst=null,hitsChartInst=null,clubChartInst=null,benchChartInst=null;
+let pointsChartSeries=[],pointsChartLabels=[];
+let animRafId=null,animPlaying=false;
+
+function easeInOutQuad(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
+
+const pointsTipPlugin={
+  id:'pointsTipDots',
+  afterDatasetsDraw(chart){
+    if(chart.canvas.id!=='pointsChart'||!pointsChartSeries.length)return;
+    const finalX=pointsChartLabels.length-1;
+    const progress=chart.$progress??finalX;
+    const xScale=chart.scales.x,yScale=chart.scales.y,ctx=chart.ctx;
+    pointsChartSeries.forEach(s=>{
+      const vals=s.values;
+      let y;
+      if(progress<=0){y=vals[0]}
+      else{
+        const i0=Math.floor(progress),i1=Math.min(i0+1,vals.length-1),t=progress-i0;
+        y=vals[i0]+(vals[i1]-vals[i0])*t;
+      }
+      const px=xScale.getPixelForValue(progress),py=yScale.getPixelForValue(y);
+      ctx.save();
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle=s.color;ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle='#2B1030';ctx.stroke();
+      ctx.restore();
+    });
+  }
+};
+
 function getAccumBench(){
   const totals={};
   getAllGWs().forEach(gw=>{
@@ -374,22 +395,64 @@ function render(gw){
     <div class="stat-box"><div class="value">~81</div><div class="label">Avg Global</div></div>
     <div class="stat-box"><div class="value">${data.standings.length}</div><div class="label">Tim</div></div>`;
 
+  if(animRafId){cancelAnimationFrame(animRafId);animRafId=null;animPlaying=false;
+    const bAnim=document.getElementById('btnAnimPoints');
+    const bPdf=document.getElementById('btnPdfPoints');
+    if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}
+    if(bPdf){bPdf.disabled=false;bPdf.style.opacity='1';bPdf.style.cursor='pointer';}}
   if(pointsChartInst)pointsChartInst.destroy();
   const allGWs=getAllGWs();
   const teamOrder=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
   const colors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];
   const labels=['Start'].concat(allGWs.map(g=>'GW'+g));
-  const datasets=teamOrder.map((team,idx)=>{
+  const seriesData=teamOrder.map((team,idx)=>{
     let running=0;const points=[0];
     allGWs.forEach(g=>{const row=LEAGUE_DATA[g].standings.find(s=>s.team===team);if(row)running=row.total;points.push(running)});
-    return{label:team,data:points,borderColor:colors[idx%colors.length],backgroundColor:colors[idx%colors.length]+'22',borderWidth:2.5,pointRadius:4,pointHoverRadius:6,tension:0.25,fill:false};
+    return{label:team,color:colors[idx%colors.length],values:points};
   });
+  pointsChartSeries=seriesData;
+  pointsChartLabels=labels;
+  const finalMaxX=labels.length-1;
+  const allValues=seriesData.flatMap(s=>s.values);
+  const yMaxFixed=Math.ceil(Math.max(...allValues)/20)*20+20;
+  const datasets=seriesData.map(s=>({
+    label:s.label,
+    data:s.values.map((y,i)=>({x:i,y})),
+    borderColor:s.color,
+    backgroundColor:s.color+'22',
+    borderWidth:2.5,
+    pointRadius:0,
+    pointHoverRadius:6,
+    tension:0,
+    fill:false
+  }));
   pointsChartInst=new Chart(document.getElementById('pointsChart'),{
-    type:'line',data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+' pts'}}},
-      scales:{y:{beginAtZero:true,title:{display:true,text:'Total Poin'},grid:{color:'rgba(255,255,255,0.06)'}},x:{title:{display:true,text:'Gameweek'},grid:{display:false}}}}
+    type:'line',
+    data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' pts'}}
+      },
+      onClick:(e,elements,chart)=>{
+        const pts=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
+        if(pts.length){chart.tooltip.setActiveElements(pts,{x:e.x,y:e.y});chart.update();}
+      },
+      scales:{
+        y:{beginAtZero:true,min:0,max:yMaxFixed,title:{display:true,text:'Total Poin'},grid:{color:'rgba(255,255,255,0.06)'}},
+        x:{
+          type:'linear',min:0,max:finalMaxX,
+          ticks:{stepSize:1,color:'#8B7A8E',callback:v=>(Math.abs(v-Math.round(v))<0.01?(pointsChartLabels[Math.round(v)]??''):'')},
+          title:{display:true,text:'Gameweek'},grid:{display:false}
+        }
+      }
+    },
+    plugins:[pointsTipPlugin]
   });
+  pointsChartInst.$progress=finalMaxX;
 
   const benchTotals=getAccumBench();
   const benchTeams=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
@@ -505,7 +568,7 @@ function render(gw){
       <p><strong>King Polenk</strong> puncak dengan 66 poin lewat differential + captain João Pedro.</p></div>
     <div class="insight-box"><h4>2. Bench Boost SCOUSER</h4>
       <p>SCOUSER memakai Bench Boost, finis rank 2 (58 pts).</p></div>
-    <div class="insight-box"><h4>3. Formasi &amp; Captain</h4>
+    <div class="insight-box"><h4>3. Formasi & Captain</h4>
       <p>3-4-3 paling populer. Haaland captain favorit, juara mingguan captain João Pedro.</p></div>
     <div class="insight-box"><h4>4. Catatan</h4>
       <p>Gunakan filter Gameweek untuk detail per minggu.</p></div>`;
@@ -531,84 +594,79 @@ select.addEventListener('change',()=>render(parseInt(select.value)));
 
 function downloadPointsChartPDF(){
   if(!pointsChartInst){alert('Chart belum siap');return}
+
+  // Pastikan chart dalam kondisi penuh (bukan lagi mid-animasi) sebelum di-capture
+  if(animRafId){cancelAnimationFrame(animRafId);animRafId=null;animPlaying=false;
+    const bAnim=document.getElementById('btnAnimPoints');
+    const bPdf=document.getElementById('btnPdfPoints');
+    if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}
+    if(bPdf){bPdf.disabled=false;bPdf.style.opacity='1';bPdf.style.cursor='pointer';}}
+  const finalMaxX=pointsChartLabels.length-1;
+  pointsChartInst.options.scales.x.max=finalMaxX;
+  pointsChartInst.$progress=finalMaxX;
+  pointsChartInst.update('none');
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
   const pageW = 297, pageH = 210;
   const margin = 14;
   const contentW = pageW - margin*2;
-  const chartTop = 28;
-  const chartH = pageH - chartTop - margin - 6;
 
-  // Build a separate, offscreen chart just for the export instead of
-  // reskinning the live one. This is what actually gives us:
-  //  1) a real white background (via the customCanvasBackgroundColor
-  //     plugin — the old code set chart.options.backgroundColor, which
-  //     isn't a real Chart.js option and never painted anything)
-  //  2) a crisp, non-blurry image — we render at a fixed high pixel
-  //     resolution and devicePixelRatio, then let jsPDF scale it down
-  //     into the page slot, instead of upscaling a small on-screen canvas
-  //  3) no flicker on the visible dashboard, since the real chart is
-  //     never touched
-  const exportWidthPx = 1600;
-  const exportHeightPx = Math.round(exportWidthPx * (chartH / contentW));
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = exportWidthPx;
-  tempCanvas.height = exportHeightPx;
-  tempCanvas.style.position = 'fixed';
-  tempCanvas.style.left = '-99999px';
-  tempCanvas.style.top = '0';
-  document.body.appendChild(tempCanvas);
+  // Snapshot current chart options to restore after export
+  const chart = pointsChartInst;
+  const saved = {
+    bg: chart.options.backgroundColor,
+    legendColor: chart.options.plugins?.legend?.labels?.color,
+    titleColor: chart.options.plugins?.title?.color,
+    xGrid: chart.options.scales?.x?.grid?.color,
+    yGrid: chart.options.scales?.y?.grid?.color,
+    xTick: chart.options.scales?.x?.ticks?.color,
+    yTick: chart.options.scales?.y?.ticks?.color,
+    xTitle: chart.options.scales?.x?.title?.color,
+    yTitle: chart.options.scales?.y?.title?.color,
+  };
 
-  const srcData = pointsChartInst.config.data;
-  const exportChart = new Chart(tempCanvas, {
-    type: 'line',
-    data: {
-      labels: srcData.labels,
-      datasets: srcData.datasets.map(ds => ({
-        label: ds.label,
-        data: ds.data,
-        borderColor: ds.borderColor,
-        backgroundColor: ds.backgroundColor,
-        borderWidth: 3,
-        pointRadius: 5,
-        pointHoverRadius: 6,
-        pointBackgroundColor: ds.borderColor,
-        tension: ds.tension,
-        fill: false
-      }))
-    },
-    options: {
-      responsive: false,
-      animation: false,
-      devicePixelRatio: 2,
-      layout: { padding: 10 },
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { color: '#0F172A', font: { family: 'Inter', size: 18 }, boxWidth: 18, padding: 16 }
-        },
-        tooltip: { enabled: false },
-        customCanvasBackgroundColor: { color: '#FFFFFF' }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Total Poin', color: '#334155', font: { size: 15 } },
-          ticks: { color: '#475569', font: { size: 13 } },
-          grid: { color: 'rgba(15,23,42,0.08)' }
-        },
-        x: {
-          title: { display: true, text: 'Gameweek', color: '#334155', font: { size: 15 } },
-          ticks: { color: '#475569', font: { size: 13 } },
-          grid: { display: false }
-        }
-      }
-    }
-  });
+  // Force light theme + high DPI for sharp PDF
+  const SCALE = 3;
+  const canvas = chart.canvas;
+  const cssW = canvas.offsetWidth;
+  const cssH = canvas.offsetHeight;
+  const prevRatio = chart.options.devicePixelRatio || window.devicePixelRatio || 1;
 
-  const img = exportChart.toBase64Image('image/png', 1.0);
-  exportChart.destroy();
-  document.body.removeChild(tempCanvas);
+  chart.options.backgroundColor = '#FFFFFF';
+  chart.options.devicePixelRatio = SCALE;
+  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = '#0F172A';
+  if(chart.options.scales?.x){
+    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = 'rgba(15,23,42,0.08)';
+    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = '#475569';
+    if(chart.options.scales.x.title) chart.options.scales.x.title.color = '#334155';
+  }
+  if(chart.options.scales?.y){
+    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = 'rgba(15,23,42,0.08)';
+    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = '#475569';
+    if(chart.options.scales.y.title) chart.options.scales.y.title.color = '#334155';
+  }
+  chart.resize(cssW, cssH);
+  chart.update('none');
+
+  const img = chart.toBase64Image('image/png', 1.0);
+
+  // Restore dark theme + original DPI
+  chart.options.backgroundColor = saved.bg;
+  chart.options.devicePixelRatio = prevRatio;
+  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = saved.legendColor;
+  if(chart.options.scales?.x){
+    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = saved.xGrid;
+    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = saved.xTick;
+    if(chart.options.scales.x.title) chart.options.scales.x.title.color = saved.xTitle;
+  }
+  if(chart.options.scales?.y){
+    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = saved.yGrid;
+    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = saved.yTick;
+    if(chart.options.scales.y.title) chart.options.scales.y.title.color = saved.yTitle;
+  }
+  chart.resize();
+  chart.update('none');
 
   // White page
   pdf.setFillColor(255, 255, 255);
@@ -629,6 +687,8 @@ function downloadPointsChartPDF(){
   pdf.setLineWidth(0.3);
   pdf.line(margin, 24, pageW - margin, 24);
 
+  const chartTop = 28;
+  const chartH = pageH - chartTop - margin - 6;
   pdf.addImage(img, 'PNG', margin, chartTop, contentW, chartH);
 
   pdf.setFontSize(8);
@@ -638,6 +698,44 @@ function downloadPointsChartPDF(){
 
   pdf.save('QA-Nippon-Paint-Akumulasi-Poin.pdf');
 }
+
+
+function playPointsChartAnimation(){
+  if(!pointsChartInst||animPlaying)return;
+  const chart=pointsChartInst;
+  const finalMaxX=pointsChartLabels.length-1;
+  const btn=document.getElementById('btnAnimPoints');
+  const pdfBtn=document.getElementById('btnPdfPoints');
+  animPlaying=true;
+  if(btn){btn.disabled=true;btn.textContent='▶ Memutar...';btn.style.opacity='0.6';}
+  if(pdfBtn){pdfBtn.disabled=true;pdfBtn.style.opacity='0.5';pdfBtn.style.cursor='not-allowed';}
+
+  const DURATION=4500;
+  chart.options.scales.x.max=0.001;
+  chart.$progress=0;
+  chart.update('none');
+
+  const t0=performance.now();
+  function tick(now){
+    const t=Math.min((now-t0)/DURATION,1);
+    const eased=easeInOutQuad(t);
+    const progress=eased*finalMaxX;
+    chart.$progress=progress;
+    chart.options.scales.x.max=Math.max(progress,0.001);
+    chart.update('none');
+    if(t<1){
+      animRafId=requestAnimationFrame(tick);
+    }else{
+      animPlaying=false;animRafId=null;
+      if(btn){btn.disabled=false;btn.textContent='▶ Putar Animasi';btn.style.opacity='1';}
+      if(pdfBtn){pdfBtn.disabled=false;pdfBtn.style.opacity='1';pdfBtn.style.cursor='pointer';}
+    }
+  }
+  animRafId=requestAnimationFrame(tick);
+}
+
+document.getElementById('btnAnimPoints')?.addEventListener('click', playPointsChartAnimation);
+
 
 document.getElementById('btnPdfPoints')?.addEventListener('click', downloadPointsChartPDF);
 
