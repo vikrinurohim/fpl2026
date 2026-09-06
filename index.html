@@ -144,6 +144,11 @@ tr:hover td{background:rgba(0,255,135,0.04)}
       <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem">
         <h2 style="margin:0;padding:0;border:none">Akumulasi Poin Sepanjang Musim</h2>
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button type="button" id="btnHybridPoints" style="
+            background:transparent;color:var(--fpl-cyan);border:1.5px solid var(--fpl-cyan);border-radius:999px;
+            padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap;display:none">
+            🔍 Fokus ke 5 GW Terakhir
+          </button>
           <button type="button" id="btnAnimPoints" style="
             background:transparent;color:var(--fpl-green);border:1.5px solid var(--fpl-green);border-radius:999px;
             padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap">
@@ -317,6 +322,15 @@ function movementHtml(rank,lastRank){
 
 let pointsChartInst=null,hitsChartInst=null,clubChartInst=null,benchChartInst=null;
 let pointsChartSeries=[],pointsChartLabels=[];
+let pointsFullSeries=[],pointsFullLabels=[],pointsHybridFocused=false;
+const HYBRID_FOCUS_N=5; // fokus ke N gameweek terakhir
+
+function rangeYConfig(valuesList){
+  const all=valuesList.flat();
+  const min=Math.min(...all),max=Math.max(...all);
+  const pad=Math.max(10,(max-min)*0.15);
+  return {min:Math.max(0,Math.floor((min-pad)/10)*10),max:Math.ceil((max+pad)/10)*10};
+}
 let animRafId=null,animPlaying=false;
 
 function easeInOutQuad(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
@@ -327,6 +341,7 @@ const pointsTipPlugin={
     if(chart.canvas.id!=='pointsChart'||!pointsChartSeries.length)return;
     const finalX=pointsChartLabels.length-1;
     const progress=chart.$progress??finalX;
+    if(progress>=finalX-1e-6)return; // diam/selesai: biar marker asli Chart.js yang tampil, bukan dot custom
     const xScale=chart.scales.x,yScale=chart.scales.y,ctx=chart.ctx;
     pointsChartSeries.forEach(s=>{
       const vals=s.values;
@@ -367,6 +382,73 @@ function renderClubChart(managerName){
   });
 }
 
+function buildPointsChart(forceOverview){
+  if(pointsChartInst)pointsChartInst.destroy();
+  const showFocused=pointsHybridFocused&&!forceOverview&&pointsFullLabels.length>2;
+  let labels,seriesForView,yCfg;
+  if(!showFocused){
+    labels=pointsFullLabels;
+    seriesForView=pointsFullSeries;
+    const allValues=pointsFullSeries.flatMap(s=>s.values);
+    yCfg={beginAtZero:true,min:0,max:Math.ceil(Math.max(...allValues)/20)*20+20};
+  }else{
+    const totalPts=pointsFullLabels.length; // termasuk 'Start'
+    const n=Math.min(HYBRID_FOCUS_N,totalPts-1);
+    const startIdx=totalPts-n; // index ke pointsFullLabels/values, exclusive dari Start kalau memungkinkan
+    labels=pointsFullLabels.slice(startIdx);
+    seriesForView=pointsFullSeries.map(s=>({label:s.label,color:s.color,values:s.values.slice(startIdx)}));
+    yCfg=Object.assign({beginAtZero:false},rangeYConfig(seriesForView.map(s=>s.values)));
+  }
+  pointsChartSeries=seriesForView;
+  pointsChartLabels=labels;
+  const finalMaxX=labels.length-1;
+  const datasets=seriesForView.map(s=>({
+    label:s.label,
+    data:s.values.map((y,i)=>({x:i,y})),
+    borderColor:s.color,
+    backgroundColor:s.color+'22',
+    borderWidth:2.5,
+    pointRadius:4,
+    pointHoverRadius:6,
+    tension:0,
+    fill:false
+  }));
+  pointsChartInst=new Chart(document.getElementById('pointsChart'),{
+    type:'line',
+    data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' pts'}}
+      },
+      onClick:(e,elements,chart)=>{
+        const pts=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
+        if(pts.length){chart.tooltip.setActiveElements(pts,{x:e.x,y:e.y});chart.update();}
+      },
+      scales:{
+        y:Object.assign({title:{display:true,text:'Total Poin'},grid:{color:'rgba(255,255,255,0.06)'}},yCfg),
+        x:{
+          type:'linear',min:0,max:finalMaxX,
+          ticks:{stepSize:1,color:'#8B7A8E',callback:v=>(Math.abs(v-Math.round(v))<0.01?(pointsChartLabels[Math.round(v)]??''):'')},
+          title:{display:true,text:'Gameweek'},grid:{display:false}
+        }
+      }
+    },
+    plugins:[pointsTipPlugin]
+  });
+  pointsChartInst.$progress=finalMaxX;
+
+  const btnHybrid=document.getElementById('btnHybridPoints');
+  if(btnHybrid){
+    const canFocus=pointsFullLabels.length>2;
+    btnHybrid.style.display=canFocus?'inline-flex':'none';
+    btnHybrid.textContent=pointsHybridFocused?'↩ Kembali ke Overview':('🔍 Fokus ke '+Math.min(HYBRID_FOCUS_N,pointsFullLabels.length-1)+' GW Terakhir');
+  }
+}
+
 function render(gw){
   const data=LEAGUE_DATA[gw];if(!data)return;
   document.getElementById('standingsLabel').textContent='· '+data.label;
@@ -400,7 +482,6 @@ function render(gw){
     const bPdf=document.getElementById('btnPdfPoints');
     if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}
     if(bPdf){bPdf.disabled=false;bPdf.style.opacity='1';bPdf.style.cursor='pointer';}}
-  if(pointsChartInst)pointsChartInst.destroy();
   const allGWs=getAllGWs();
   const teamOrder=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
   const colors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];
@@ -410,49 +491,9 @@ function render(gw){
     allGWs.forEach(g=>{const row=LEAGUE_DATA[g].standings.find(s=>s.team===team);if(row)running=row.total;points.push(running)});
     return{label:team,color:colors[idx%colors.length],values:points};
   });
-  pointsChartSeries=seriesData;
-  pointsChartLabels=labels;
-  const finalMaxX=labels.length-1;
-  const allValues=seriesData.flatMap(s=>s.values);
-  const yMaxFixed=Math.ceil(Math.max(...allValues)/20)*20+20;
-  const datasets=seriesData.map(s=>({
-    label:s.label,
-    data:s.values.map((y,i)=>({x:i,y})),
-    borderColor:s.color,
-    backgroundColor:s.color+'22',
-    borderWidth:2.5,
-    pointRadius:0,
-    pointHoverRadius:6,
-    tension:0,
-    fill:false
-  }));
-  pointsChartInst=new Chart(document.getElementById('pointsChart'),{
-    type:'line',
-    data:{datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},
-        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' pts'}}
-      },
-      onClick:(e,elements,chart)=>{
-        const pts=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
-        if(pts.length){chart.tooltip.setActiveElements(pts,{x:e.x,y:e.y});chart.update();}
-      },
-      scales:{
-        y:{beginAtZero:true,min:0,max:yMaxFixed,title:{display:true,text:'Total Poin'},grid:{color:'rgba(255,255,255,0.06)'}},
-        x:{
-          type:'linear',min:0,max:finalMaxX,
-          ticks:{stepSize:1,color:'#8B7A8E',callback:v=>(Math.abs(v-Math.round(v))<0.01?(pointsChartLabels[Math.round(v)]??''):'')},
-          title:{display:true,text:'Gameweek'},grid:{display:false}
-        }
-      }
-    },
-    plugins:[pointsTipPlugin]
-  });
-  pointsChartInst.$progress=finalMaxX;
+  pointsFullSeries=seriesData;
+  pointsFullLabels=labels;
+  buildPointsChart();
 
   const benchTotals=getAccumBench();
   const benchTeams=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
@@ -601,6 +642,10 @@ function downloadPointsChartPDF(){
     const bPdf=document.getElementById('btnPdfPoints');
     if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}
     if(bPdf){bPdf.disabled=false;bPdf.style.opacity='1';bPdf.style.cursor='pointer';}}
+
+  // PDF selalu tampilkan overview musim penuh, apa pun tampilan yang lagi aktif di layar
+  const wasFocused=pointsHybridFocused;
+  if(wasFocused){ buildPointsChart(true); }
   const finalMaxX=pointsChartLabels.length-1;
   pointsChartInst.options.scales.x.max=finalMaxX;
   pointsChartInst.$progress=finalMaxX;
@@ -627,7 +672,7 @@ function downloadPointsChartPDF(){
   };
 
   // Force light theme + high DPI for sharp PDF
-  const SCALE = 3;
+  const SCALE = 4;
   const canvas = chart.canvas;
   const cssW = canvas.offsetWidth;
   const cssH = canvas.offsetHeight;
@@ -697,6 +742,9 @@ function downloadPointsChartPDF(){
   pdf.text(new Date().toISOString().slice(0,10), pageW - margin - 22, pageH - 6);
 
   pdf.save('QA-Nippon-Paint-Akumulasi-Poin.pdf');
+
+  // Balikin tampilan layar ke mode fokus lagi kalau sebelumnya memang lagi fokus
+  if(wasFocused){ buildPointsChart(); }
 }
 
 
@@ -735,6 +783,14 @@ function playPointsChartAnimation(){
 }
 
 document.getElementById('btnAnimPoints')?.addEventListener('click', playPointsChartAnimation);
+
+document.getElementById('btnHybridPoints')?.addEventListener('click', () => {
+  if(animRafId){cancelAnimationFrame(animRafId);animRafId=null;animPlaying=false;
+    const bAnim=document.getElementById('btnAnimPoints');
+    if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}}
+  pointsHybridFocused = !pointsHybridFocused;
+  buildPointsChart();
+});
 
 
 document.getElementById('btnPdfPoints')?.addEventListener('click', downloadPointsChartPDF);
