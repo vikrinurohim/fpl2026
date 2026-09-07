@@ -87,8 +87,8 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 .club-modal pre{background:var(--bg-elevated);border-radius:10px;padding:1rem;font-size:0.78rem;overflow:auto;color:var(--text-secondary);line-height:1.45;border:1px solid var(--border);white-space:pre-wrap;word-break:break-word}
 .club-modal .close-btn{float:right;background:transparent;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:0.35rem 0.7rem;cursor:pointer;font-family:inherit;font-size:0.8rem}
 .club-modal .close-btn:hover{border-color:var(--fpl-green);color:var(--fpl-green)}
-.club-count-btn{background:transparent;border:none;color:var(--fpl-green);font-weight:700;font-size:inherit;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.club-count-btn:hover{color:#fff}
+
+
 
 
 .json-tree{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.78rem;line-height:1.45;color:var(--text-secondary);background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;overflow:auto;max-height:520px}
@@ -103,6 +103,38 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 .json-tree summary::before{content:'▶ ';font-size:0.65rem;color:var(--muted)}
 .json-tree details[open]>summary::before{content:'▼ '}
 .json-tree .jt-inline{color:var(--muted)}
+
+
+.club-count-btn{
+  background:rgba(0,255,135,0.12);
+  border:1px solid rgba(0,255,135,0.45);
+  color:var(--fpl-green);
+  font-weight:700;
+  font-size:0.85rem;
+  font-family:inherit;
+  cursor:pointer;
+  border-radius:999px;
+  padding:0.25rem 0.7rem;
+  text-decoration:none;
+  transition:background 0.15s, box-shadow 0.15s;
+}
+.club-count-btn:hover{
+  background:rgba(0,255,135,0.25);
+  box-shadow:0 0 0 3px rgba(0,255,135,0.15);
+  color:#fff;
+}
+.club-count-btn::after{content:' ↗';font-size:0.7rem;opacity:0.8}
+.hint-box{
+  background:rgba(4,245,255,0.08);
+  border:1px solid rgba(4,245,255,0.25);
+  border-radius:10px;
+  padding:0.75rem 1rem;
+  font-size:0.8rem;
+  color:var(--text-secondary);
+  margin-bottom:0.85rem;
+  line-height:1.55;
+}
+.hint-box strong{color:var(--fpl-cyan)}
 
 </style>
 </head>
@@ -161,17 +193,27 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 <label for="managerClubSelect" style="font-weight:600;font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Manager</label>
 <select id="managerClubSelect" style="padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:10px;font-size:0.88rem;font-family:inherit;background:var(--bg-elevated);color:var(--text);min-width:200px;font-weight:600"></select>
 </div>
+<div class="hint-box" id="clubHint">💡 <strong>Cara pakai:</strong> klik angka hijau di kolom <em>Jumlah Pemain</em> (contoh: <span style="color:var(--fpl-green);font-weight:700">5</span>) untuk membuka detail JSON — nama pemain, menit main, poin, dan penjelasan skor per gameweek.</div>
 <div id="clubTable" style="overflow-x:auto"></div>
-<p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Hanya Starting XI yang dipilih · autosub dari bench tidak menambah total · klik angka untuk menit, poin, dan keterangan ganti pemain</p>
+<p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Hanya Starting XI yang dipilih · autosub tidak menambah total. <strong style="color:var(--fpl-green)">Angka hijau = tombol</strong> — klik untuk lihat detail pemain, menit, poin, dan autosub.</p>
 </div>
 
 <div class="card">
 <h2>Line-up Season</h2>
-<p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Akumulasi Starting XI sepanjang musim · detail per GW (klik node untuk expand)</p>
+<p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Akumulasi Starting XI sepanjang musim · buka baris bertanda ▶ untuk melihat isi (lihat panduan di bawah)</p>
 <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
 <label for="managerLineupSelect" style="font-weight:600;font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Manager</label>
 <select id="managerLineupSelect" style="padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:10px;font-size:0.88rem;font-family:inherit;background:var(--bg-elevated);color:var(--text);min-width:200px;font-weight:600"></select>
 <button type="button" id="btnCopyLineup" style="background:transparent;color:var(--fpl-green);border:1px solid var(--fpl-green);border-radius:999px;padding:0.4rem 0.9rem;font-weight:600;font-size:0.75rem;font-family:inherit;cursor:pointer">Copy JSON</button>
+</div>
+<div class="hint-box" id="lineupHint">
+<strong>📘 Panduan baca (untuk yang belum terbiasa JSON)</strong><br>
+1. Pilih <strong>Manager</strong> di dropdown di atas.<br>
+2. Yang tampil adalah data line-up-nya sepanjang musim, disusun berlapis.<br>
+3. Tanda <strong>▶</strong> = masih tertutup · klik tulisan itu untuk <strong>membuka</strong>. Tanda <strong>▼</strong> = sudah terbuka · klik lagi untuk menutup.<br>
+4. Buka <strong>by_gameweek</strong> → pilih minggu (0 = GW1, 1 = GW2, dst) → buka <strong>players</strong> untuk lihat 11 pemain.<br>
+5. Di tiap pemain: <strong>points</strong> = poin yang masuk skor (sudah × captain), <strong>points_breakdown</strong> = kenapa poinnya segitu, <strong>note</strong> = kalau ada ganti dari bench.<br>
+6. Tombol <strong>Copy JSON</strong> menyalin semua data ke clipboard (bisa ditempel di WhatsApp / notepad).
 </div>
 <div id="lineupTree" class="json-tree"></div>
 </div>
