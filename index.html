@@ -11,59 +11,39 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <style>
 :root {
-  --fpl-purple: #37003C;
-  --fpl-purple-mid: #4A0E4E;
-  --fpl-pink: #E90052;
-  --fpl-green: #00FF87;
-  --fpl-cyan: #04F5FF;
-  --bg: #1A0A1C;
-  --bg-card: #2B1030;
-  --bg-elevated: #3D1A42;
-  --border: rgba(255,255,255,0.08);
-  --text: #FFFFFF;
-  --text-secondary: #C4B5C8;
-  --muted: #8B7A8E;
-  --radius: 14px;
-  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --fpl-purple: #37003C; --fpl-pink: #E90052; --fpl-green: #00FF87; --fpl-cyan: #04F5FF;
+  --bg: #1A0A1C; --bg-card: #2B1030; --bg-elevated: #3D1A42;
+  --border: rgba(255,255,255,0.08); --text: #FFFFFF; --text-secondary: #C4B5C8; --muted: #8B7A8E;
+  --radius: 14px; --shadow: 0 8px 24px rgba(0,0,0,0.35);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;min-height:100vh}
 h1,h2,h3,h4{font-family:'Plus Jakarta Sans','Inter',sans-serif;font-weight:700;letter-spacing:-0.02em}
 .header{background:linear-gradient(145deg,#37003C 0%,#5C1260 45%,#E90052 160%);padding:2rem 1.25rem 1.75rem;text-align:center;position:relative;overflow:hidden;border-bottom:3px solid var(--fpl-green)}
 .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(0,255,135,0.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(233,0,82,0.15) 0%,transparent 45%);pointer-events:none}
 .header-content{position:relative;z-index:1}
 .header .league-badge{display:inline-block;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.35);color:var(--fpl-green);font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.75rem;border-radius:999px;margin-bottom:0.75rem}
-.header h1{font-size:1.75rem;font-weight:800;margin-bottom:0.25rem;text-shadow:0 2px 12px rgba(0,0,0,0.3)}
+.header h1{font-size:1.75rem;font-weight:800;margin-bottom:0.25rem}
 .header .subtitle{font-size:0.9rem;color:var(--text-secondary);font-weight:500}
 .header .meta{font-size:0.75rem;color:var(--muted);margin-top:0.4rem}
 .container{max-width:1080px;margin:0 auto;padding:1.25rem 1rem 3rem}
 .filter-bar{background:var(--bg-card);border-radius:var(--radius);padding:0.9rem 1.15rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.85rem;align-items:center;justify-content:space-between;border:1px solid var(--border);box-shadow:var(--shadow)}
 .filter-bar label{font-weight:600;font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em}
 .filter-bar select{padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:10px;font-size:0.88rem;font-family:inherit;background:var(--bg-elevated);color:var(--text);font-weight:600;min-width:150px;cursor:pointer}
-.filter-bar select:focus{outline:none;border-color:var(--fpl-green);box-shadow:0 0 0 3px rgba(0,255,135,0.15)}
 .last-update{font-size:0.75rem;color:var(--muted);font-weight:500}
-.tabs{display:flex;gap:0.35rem;flex-wrap:nowrap;margin-bottom:1.25rem;background:var(--bg-card);padding:0.4rem;border-radius:999px;border:1px solid var(--border);box-shadow:var(--shadow);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs{display:flex;gap:0.35rem;flex-wrap:nowrap;margin-bottom:1.25rem;background:var(--bg-card);padding:0.4rem;border-radius:999px;border:1px solid var(--border);box-shadow:var(--shadow);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:0.55rem 1rem;background:transparent;border:none;border-radius:999px;cursor:pointer;font-weight:600;font-size:0.8rem;font-family:inherit;color:var(--text-secondary);transition:all 0.18s ease;white-space:nowrap;flex-shrink:0}
+.tab{padding:0.55rem 1rem;background:transparent;border:none;border-radius:999px;cursor:pointer;font-weight:600;font-size:0.8rem;font-family:inherit;color:var(--text-secondary);white-space:nowrap;flex-shrink:0}
 .tab:hover{color:var(--text);background:rgba(255,255,255,0.05)}
 .tab.active{background:var(--fpl-green);color:#0A0A0A;box-shadow:0 2px 12px rgba(0,255,135,0.35)}
-.panel{display:none}
-.panel.active{display:block;animation:fadeIn 0.28s ease}
+.panel{display:none}.panel.active{display:block;animation:fadeIn 0.28s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.hero-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem}
-.hero-card{background:var(--bg-card);border-radius:var(--radius);padding:1.1rem 0.85rem;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}
-.hero-card.highlight{background:linear-gradient(160deg,#3D1A42 0%,#1A4D3A 100%);border-color:rgba(0,255,135,0.3)}
-.hero-card .h-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);font-weight:600;margin-bottom:0.35rem}
-.hero-card .h-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.65rem;font-weight:800;color:var(--fpl-green);line-height:1.1}
-.hero-card .h-sub{font-size:0.75rem;color:var(--text-secondary);margin-top:0.3rem;font-weight:500}
 .card{background:var(--bg-card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.35rem;margin-bottom:1.1rem;border:1px solid var(--border)}
 .card h2{font-size:1.05rem;color:var(--text);margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem}
 .card h2::before{content:'';width:4px;height:1.1em;background:var(--fpl-green);border-radius:2px;flex-shrink:0}
 table{width:100%;border-collapse:collapse;font-size:0.85rem}
 th{background:var(--fpl-purple);color:var(--fpl-green);padding:0.7rem 0.55rem;text-align:center;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em}
-th:first-child{border-radius:8px 0 0 0}th:last-child{border-radius:0 8px 0 0}
 td{padding:0.65rem 0.55rem;text-align:center;border-bottom:1px solid var(--border);color:var(--text-secondary)}
-tr:last-child td{border-bottom:none}
 tr:nth-child(even){background:rgba(255,255,255,0.02)}
 tr:hover td{background:rgba(0,255,135,0.04)}
 .rank-1{background:rgba(0,255,135,0.1)!important}.rank-1 td{color:var(--text);font-weight:600}
@@ -72,7 +52,7 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.7rem;margin-top:1.1rem}
 .stat-box{background:var(--bg-elevated);border-radius:12px;padding:1rem 0.75rem;text-align:center;border:1px solid var(--border)}
 .stat-box .value{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;color:var(--fpl-green)}
-.stat-box .label{font-size:0.7rem;color:var(--muted);margin-top:0.2rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em}
+.stat-box .label{font-size:0.7rem;color:var(--muted);margin-top:0.2rem;font-weight:600;text-transform:uppercase}
 .badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:6px;font-size:0.7rem;font-weight:700}
 .badge-green{background:rgba(0,255,135,0.18);color:var(--fpl-green)}
 .badge-blue{background:rgba(4,245,255,0.15);color:var(--fpl-cyan)}
@@ -83,7 +63,7 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 .squad-detail{background:var(--bg-elevated);border-radius:12px;padding:1.05rem 1.15rem;margin-bottom:0.8rem;border:1px solid var(--border);border-left:3px solid var(--fpl-pink)}
 .squad-detail h4{color:var(--text);margin-bottom:0.3rem;font-size:0.92rem}
 .squad-detail .meta{font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500}
-.pos-label{font-weight:700;color:var(--fpl-green);font-size:0.72rem;min-width:34px;display:inline-block;text-transform:uppercase;letter-spacing:0.03em}
+.pos-label{font-weight:700;color:var(--fpl-green);font-size:0.72rem;min-width:34px;display:inline-block;text-transform:uppercase}
 .squad-detail p{font-size:0.82rem;margin-bottom:0.18rem;color:var(--text-secondary)}
 .insight-box{background:var(--bg-elevated);border-left:4px solid var(--fpl-pink);padding:0.95rem 1.1rem;margin-bottom:0.75rem;border-radius:0 12px 12px 0}
 .insight-box h4{color:var(--fpl-green);margin-bottom:0.25rem;font-size:0.9rem}
@@ -94,130 +74,134 @@ tr:hover td{background:rgba(0,255,135,0.04)}
 .footer{text-align:center;padding:1.75rem 1rem;color:var(--muted);font-size:0.75rem;font-weight:500;border-top:1px solid var(--border);margin-top:1rem}
 .footer span{color:var(--fpl-green)}
 @media(max-width:768px){
-  .header{padding:1.5rem 1rem 1.35rem}.header h1{font-size:1.35rem}
-  .hero-row{grid-template-columns:1fr}.hero-card .h-value{font-size:1.45rem}
-  .container{padding:1rem 0.75rem 2.5rem}.tabs{border-radius:12px}
+  .header h1{font-size:1.35rem}.container{padding:1rem 0.75rem 2.5rem}
   .card{padding:1.1rem;overflow-x:auto}.two-col{grid-template-columns:1fr}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   table{font-size:0.78rem;min-width:540px}.chart-container{height:240px}
 }
-@media(max-width:420px){
-  .header h1{font-size:1.2rem}.filter-bar{flex-direction:column;align-items:flex-start}
-  .tab{padding:0.45rem 0.75rem;font-size:0.75rem}
-}
+
+.club-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+.club-modal-overlay.open{display:flex}
+.club-modal{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;max-width:520px;width:100%;max-height:85vh;overflow:auto;box-shadow:var(--shadow);padding:1.25rem}
+.club-modal h3{margin-bottom:0.75rem;font-size:1.05rem}
+.club-modal pre{background:var(--bg-elevated);border-radius:10px;padding:1rem;font-size:0.78rem;overflow:auto;color:var(--text-secondary);line-height:1.45;border:1px solid var(--border);white-space:pre-wrap;word-break:break-word}
+.club-modal .close-btn{float:right;background:transparent;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:0.35rem 0.7rem;cursor:pointer;font-family:inherit;font-size:0.8rem}
+.club-modal .close-btn:hover{border-color:var(--fpl-green);color:var(--fpl-green)}
+.club-count-btn{background:transparent;border:none;color:var(--fpl-green);font-weight:700;font-size:inherit;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.club-count-btn:hover{color:#fff}
+
+
+.json-tree{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.78rem;line-height:1.45;color:var(--text-secondary);background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;overflow:auto;max-height:520px}
+.json-tree .jt-key{color:#c792ea}
+.json-tree .jt-str{color:#c3e88d}
+.json-tree .jt-num{color:#f78c6c}
+.json-tree .jt-bool{color:#89ddff}
+.json-tree .jt-null{color:var(--muted)}
+.json-tree details{margin-left:0.85rem}
+.json-tree summary{cursor:pointer;list-style:none;color:var(--fpl-cyan)}
+.json-tree summary::-webkit-details-marker{display:none}
+.json-tree summary::before{content:'▶ ';font-size:0.65rem;color:var(--muted)}
+.json-tree details[open]>summary::before{content:'▼ '}
+.json-tree .jt-inline{color:var(--muted)}
+
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="header-content">
-    <div class="league-badge">Classic League</div>
-    <h1>QA Nippon Paint</h1>
-    <p class="subtitle">Fantasy Premier League Analysis</p>
-    <p class="meta">League ID 1331564 · Season 2026/27</p>
-  </div>
-</div>
+<div class="header"><div class="header-content">
+<div class="league-badge">Classic League</div>
+<h1>QA Nippon Paint</h1>
+<p class="subtitle">Fantasy Premier League Analysis</p>
+<p class="meta">League ID 1331564 · Season 2026/27</p>
+</div></div>
 <div class="container">
-  <div class="filter-bar">
-    <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
-      <label for="gwSelect">Gameweek</label>
-      <select id="gwSelect"></select>
-    </div>
-    <div class="last-update">Data per 1 Sep 2026 · 08:17 UTC</div>
-  </div>
-  <div class="tabs">
-    <button class="tab active" data-tab="standings">Standings</button>
-    <button class="tab" data-tab="squads">Squad Analysis</button>
-    <button class="tab" data-tab="formations">Formasi & Klub</button>
-    <button class="tab" data-tab="weekly">Peringkat Mingguan</button>
-    <button class="tab" data-tab="chips">Chips</button>
-    <button class="tab" data-tab="hits">Transfer Hits</button>
-    <button class="tab" data-tab="insights">Key Insights</button>
-  </div>
+<div class="filter-bar">
+<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+<label for="gwSelect">Gameweek</label>
+<select id="gwSelect"></select>
+</div>
+<div class="last-update">Data per 7 Sep 2026 · 10:15 UTC</div>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="standings">Standings</button>
+<button class="tab" data-tab="squads">Squad Analysis</button>
+<button class="tab" data-tab="formations">Formasi &amp; Klub</button>
+<button class="tab" data-tab="weekly">Peringkat Mingguan</button>
+<button class="tab" data-tab="chips">Chips</button>
+<button class="tab" data-tab="hits">Transfer Hits</button>
+<button class="tab" data-tab="insights">Key Insights</button>
+</div>
+<div id="standings" class="panel active">
+<div class="card">
+<h2>Overall Standings <span id="standingsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2>
+<div id="standingsTable"></div>
+<div class="stats-grid" id="standingsStats"></div>
+</div>
+<div class="card">
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem">
+<h2 style="margin:0;padding:0;border:none">Akumulasi Poin Sepanjang Musim</h2>
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+<button type="button" id="btnHybridPoints" style="background:transparent;color:var(--fpl-cyan);border:1.5px solid var(--fpl-cyan);border-radius:999px;padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap;display:none">🔍 Fokus ke 5 GW Terakhir</button>
+<button type="button" id="btnAnimPoints" style="background:transparent;color:var(--fpl-green);border:1.5px solid var(--fpl-green);border-radius:999px;padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap">▶ Putar Animasi</button>
+<button type="button" id="btnPdfPoints" style="background:linear-gradient(135deg,#00FF87,#00D9A0);color:#0A0A0A;border:none;border-radius:999px;padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;box-shadow:0 2px 12px rgba(0,255,135,0.3);white-space:nowrap">Download PDF (A4)</button>
+</div>
+</div>
+<p style="font-size:0.8rem;color:var(--muted);margin:0 0 1rem">Total poin kumulatif tiap manajer per gameweek</p>
+<div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
+</div>
+<div class="card">
+<h2>Akumulasi Bench Points</h2>
+<p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Total poin di bangku yang tidak masuk skor (seluruh musim)</p>
+<div class="chart-container" style="height:280px"><canvas id="benchChart"></canvas></div>
+<p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Semakin tinggi = semakin banyak poin “terbuang” di bench</p>
+</div>
+<div class="card">
+<h2>Klub Favorit per Manager</h2>
+<p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Akumulasi pemain per klub di Starting XI (seluruh musim)</p>
+<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
+<label for="managerClubSelect" style="font-weight:600;font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Manager</label>
+<select id="managerClubSelect" style="padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:10px;font-size:0.88rem;font-family:inherit;background:var(--bg-elevated);color:var(--text);min-width:200px;font-weight:600"></select>
+</div>
+<div id="clubTable" style="overflow-x:auto"></div>
+<p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Hanya Starting XI yang dipilih · autosub dari bench tidak menambah total · klik angka untuk menit, poin, dan keterangan ganti pemain</p>
+</div>
 
-  <div id="standings" class="panel active">
-    <div class="card">
-      <h2>Overall Standings <span id="standingsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2>
-      <div id="standingsTable"></div>
-      <div class="stats-grid" id="standingsStats"></div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem">
-        <h2 style="margin:0;padding:0;border:none">Akumulasi Poin Sepanjang Musim</h2>
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-          <button type="button" id="btnHybridPoints" style="
-            background:transparent;color:var(--fpl-cyan);border:1.5px solid var(--fpl-cyan);border-radius:999px;
-            padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap;display:none">
-            🔍 Fokus ke 5 GW Terakhir
-          </button>
-          <button type="button" id="btnAnimPoints" style="
-            background:transparent;color:var(--fpl-green);border:1.5px solid var(--fpl-green);border-radius:999px;
-            padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap">
-            ▶ Putar Animasi
-          </button>
-          <button type="button" id="btnPdfPoints" style="
-            background:linear-gradient(135deg,#00FF87,#00D9A0);color:#0A0A0A;border:none;border-radius:999px;
-            padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;
-            box-shadow:0 2px 12px rgba(0,255,135,0.3);white-space:nowrap">
-            Download PDF (A4)
-          </button>
-        </div>
-      </div>
-      <p style="font-size:0.8rem;color:var(--muted);margin:0 0 1rem">Total poin kumulatif tiap manajer per gameweek</p>
-      <div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h2>Akumulasi Bench Points</h2>
-      <p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Total poin di bangku yang tidak masuk skor (seluruh musim)</p>
-      <div class="chart-container" style="height:280px"><canvas id="benchChart"></canvas></div>
-      <p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Semakin tinggi = semakin banyak poin “terbuang” di bench</p>
-    </div>
-    <div class="card">
-      <h2>Klub Favorit per Manager</h2>
-      <p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Akumulasi pemain per klub di Starting XI (seluruh musim)</p>
-      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
-        <label for="managerClubSelect" style="font-weight:600;font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Manager</label>
-        <select id="managerClubSelect" style="padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:10px;font-size:0.88rem;font-family:inherit;background:var(--bg-elevated);color:var(--text);min-width:200px;font-weight:600"></select>
-      </div>
-      <div class="chart-container" style="height:300px"><canvas id="clubChart"></canvas></div>
-      <p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Hanya Starting XI (line-up), tidak termasuk bench</p>
-    </div>
-  </div>
+<div class="card">
+<h2>Line-up Season</h2>
+<p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Akumulasi Starting XI sepanjang musim · detail per GW (klik node untuk expand)</p>
+<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
+<label for="managerLineupSelect" style="font-weight:600;font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Manager</label>
+<select id="managerLineupSelect" style="padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:10px;font-size:0.88rem;font-family:inherit;background:var(--bg-elevated);color:var(--text);min-width:200px;font-weight:600"></select>
+<button type="button" id="btnCopyLineup" style="background:transparent;color:var(--fpl-green);border:1px solid var(--fpl-green);border-radius:999px;padding:0.4rem 0.9rem;font-weight:600;font-size:0.75rem;font-family:inherit;cursor:pointer">Copy JSON</button>
+</div>
+<div id="lineupTree" class="json-tree"></div>
+</div>
 
-  <div id="squads" class="panel">
-    <div class="card">
-      <h2>Squad Analysis <span id="squadsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2>
-      <div id="squadsContent"></div>
-    </div>
-  </div>
-  <div id="formations" class="panel"><div id="formationsContent"></div></div>
-  <div id="weekly" class="panel">
-    <div class="card"><h2>Peringkat Pertama & Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
-    <div class="card"><h2>Akumulasi Sepanjang Musim</h2><div id="weeklyAccum"></div></div>
-  </div>
-  <div id="chips" class="panel"><div class="card"><h2>Penggunaan Chips</h2><div id="chipsContent"></div></div></div>
-  <div id="hits" class="panel">
-    <div class="card">
-      <h2>Transfer Hits</h2>
-      <div id="hitsContent"></div>
-      <div class="chart-container" style="margin-top:1.15rem"><canvas id="hitsChart"></canvas></div>
-    </div>
-  </div>
-  <div id="insights" class="panel">
-    <div class="card">
-      <h2>Key Insights <span id="insightsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2>
-      <div id="insightsContent"></div>
-    </div>
+</div>
+<div id="squads" class="panel"><div class="card"><h2>Squad Analysis <span id="squadsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2><div id="squadsContent"></div></div></div>
+<div id="formations" class="panel"><div id="formationsContent"></div></div>
+<div id="weekly" class="panel">
+<div class="card"><h2>Peringkat Pertama &amp; Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
+<div class="card"><h2>Akumulasi Sepanjang Musim</h2><div id="weeklyAccum"></div></div>
+</div>
+<div id="chips" class="panel"><div class="card"><h2>Penggunaan Chips</h2><div id="chipsContent"></div></div></div>
+<div id="hits" class="panel"><div class="card"><h2>Transfer Hits</h2><div id="hitsContent"></div><div class="chart-container" style="margin-top:1.15rem"><canvas id="hitsChart"></canvas></div></div></div>
+<div id="insights" class="panel"><div class="card"><h2>Key Insights <span id="insightsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2><div id="insightsContent"></div></div></div>
+</div>
+
+<div class="club-modal-overlay" id="clubModal" onclick="if(event.target===this)closeClubModal()">
+  <div class="club-modal">
+    <button type="button" class="close-btn" onclick="closeClubModal()">Tutup</button>
+    <h3 id="clubModalTitle">Detail Klub</h3>
+    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.75rem">Akumulasi slot Starting XI per gameweek</p>
+    <pre id="clubModalBody"></pre>
   </div>
 </div>
-<div class="footer">
-  <span>QA Nippon Paint</span> · FPL Classic League Analysis · League ID 1331564<br>
-  Inspired by Fantasy Premier League · Data from Official FPL API
-</div>
+
+<div class="footer"><span>QA Nippon Paint</span> · FPL Classic League Analysis · League ID 1331564<br>Inspired by Fantasy Premier League · Data from Official FPL API</div>
 <script>
 Chart.defaults.color='#C4B5C8';
 Chart.defaults.borderColor='rgba(255,255,255,0.08)';
 Chart.defaults.font.family='Inter';
-
 const LEAGUE_DATA={
 1:{
 label:"Gameweek 1",updated:"24 Aug 2026 · 21:33 UTC",
@@ -283,8 +267,47 @@ squads:[
 {rank:6,team:"Betelguese",manager:"Vikri Nur Rohim",pts:84,form:"3-4-3",chip:null,capt:"Haaland",gk:"Verbruggen (BHA)",def:"Gabriel, Guéhi, Shaw",mid:"Rice, Mbeumo (VC), Szoboszlai, Foden",fwd:"Calvert-Lewin, Haaland (C), João Pedro",clubs:"Haaland C, 25 pts di bangku",clubCounts:{"BHA":1,"ARS":2,"MCI":2,"MUN":2,"LIV":1,"LEE":1,"CHE":1}},
 {rank:7,team:"Milenials",manager:"Indra Aprilian",pts:95,form:"5-4-1",chip:null,capt:"B.Fernandes",gk:"Lammens (2)",def:"Kayode (2), Mendy (1), De Cuyper (0), Calafiori (11), Tarkowski (12)",mid:"Mbeumo (11), B.Fernandes (C·46), M.Sangarè (4), Szoboszlai (VC·4)",fwd:"Thiago (2)",clubs:"Join baru GW2 · Bruno C 46 pts · Bench: Donnarumma, Gyökeres, Semenyo, Marmoush",clubCounts:{"MUN":2,"LIV":1,"ARS":1,"EVE":1,"BHA":1,"BRE":1,"HUL":1,"BOU":1,"AVL":1}}
 ]
+},
+3:{
+label:"Gameweek 3",updated:"7 Sep 2026 · 10:15 UTC (final)",
+standings:[
+{rank:1,lastRank:3,team:"sinar muda fc",manager:"Andri Varane",gw:61,total:221,overall:590270},
+{rank:2,lastRank:5,team:"SCOUSER",manager:"Zava Anbiya",gw:68,total:219,overall:717233},
+{rank:3,lastRank:4,team:"Parpas",manager:"Rendy P",gw:64,total:218,overall:772855},
+{rank:4,lastRank:2,team:"Giri - giri",manager:"Muhammad Fariz Azhari",gw:50,total:213,overall:1102932},
+{rank:5,lastRank:1,team:"King Polenk",manager:"Andre Nosega Purnama",gw:35,total:199,overall:2462198},
+{rank:6,lastRank:6,team:"Betelguese",manager:"Vikri Nur Rohim",gw:54,total:182,overall:4687284},
+{rank:7,lastRank:7,team:"Milenials",manager:"Indra Aprilian",gw:41,total:136,overall:8660094}
+],
+first:{team:"SCOUSER",manager:"Zava Anbiya",pts:68},
+last:{team:"King Polenk",manager:"Andre Nosega Purnama",pts:35},
+chips:[
+{manager:"Andri Varane",team:"sinar muda fc",chip:"Free Hit",note:"Free Hit · rank 1 liga"},
+{manager:"Zava Anbiya",team:"SCOUSER",chip:null,note:"Manager of the Week (68 pts) · Isak C"},
+{manager:"Rendy P",team:"Parpas",chip:"Triple Captain",note:"TC Haaland"},
+{manager:"Muhammad Fariz Azhari",team:"Giri - giri",chip:"Triple Captain",note:"TC Haaland · 26 pts di bangku"},
+{manager:"Andre Nosega Purnama",team:"King Polenk",chip:null,note:"Juru kunci GW · 2 autosub"},
+{manager:"Vikri Nur Rohim",team:"Betelguese",chip:null,note:"3 transfer (−8)"},
+{manager:"Indra Aprilian",team:"Milenials",chip:null}
+],
+hits:[{team:"Betelguese",manager:"Vikri Nur Rohim",cost:8}],
+bench:{"sinar muda fc":15,"SCOUSER":18,"Parpas":11,"Giri - giri":26,"King Polenk":8,"Betelguese":22,"Milenials":8},
+squads:[
+{rank:1,team:"sinar muda fc",manager:"Andri Varane",pts:61,form:"3-4-3",chip:"Free Hit",capt:"Haaland",gk:"Kelleher (BRE)",def:"De Cuyper, Gvardiol, Hall",mid:"Elanga, Wirtz, Cherki (VC), Gibbs-White",fwd:"Thiago, Haaland (C), Isak",clubs:"Free Hit template",clubCounts:{"BRE":2,"BHA":1,"MCI":3,"NEW":2,"LIV":2,"NFO":1}},
+{rank:2,team:"SCOUSER",manager:"Zava Anbiya",pts:68,form:"4-3-3",chip:null,capt:"Isak",gk:"Tzolakis (HUL)",def:"Gvardiol, Calafiori, Ballard, N.Williams",mid:"Szoboszlai, B.Fernandes (VC), E.Le Fée",fwd:"Isak (C), João Pedro, Calvert-Lewin",clubs:"Isak C · MotW 68 pts",clubCounts:{"HUL":1,"MCI":1,"ARS":1,"SUN":2,"NFO":1,"LIV":2,"MUN":1,"CHE":1,"LEE":1}},
+{rank:3,team:"Parpas",manager:"Rendy P",pts:64,form:"4-4-2",chip:"Triple Captain",capt:"Haaland",gk:"Verbruggen (BHA)",def:"Gabriel, Pedro Porro, Shaw, Egan",mid:"B.Fernandes (VC), Szoboszlai, Mbeumo, Groß",fwd:"Haaland (C·TC), João Pedro",clubs:"TC Haaland",clubCounts:{"BHA":2,"ARS":1,"TOT":1,"MUN":3,"HUL":1,"LIV":1,"CHE":1,"MCI":1}},
+{rank:4,team:"Giri - giri",manager:"Muhammad Fariz Azhari",pts:50,form:"3-4-3",chip:"Triple Captain",capt:"Haaland",gk:"Verbruggen (BHA)",def:"Gabriel, Egan, Dedić",mid:"B.Fernandes, Cherki (VC), Szoboszlai, Groß",fwd:"Haaland (C·TC), João Pedro, Calvert-Lewin",clubs:"TC Haaland · 26 pts bench",clubCounts:{"BHA":2,"ARS":1,"HUL":1,"NEW":1,"MUN":1,"MCI":2,"LIV":1,"CHE":1,"LEE":1}},
+{rank:5,team:"King Polenk",manager:"Andre Nosega Purnama",pts:35,form:"3-5-2",chip:null,capt:"Cherki",gk:"Raya (ARS)",def:"O'Reilly, Mosquera, Ballard",mid:"B.Fernandes (VC), Rogers, Dewsbury-Hall, Cherki (C), Groß",fwd:"João Pedro, Calvert-Lewin",clubs:"Tanpa Haaland · 2 autosub",clubCounts:{"ARS":2,"MCI":2,"SUN":1,"MUN":1,"CHE":2,"EVE":1,"BHA":1,"LEE":1}},
+{rank:6,team:"Betelguese",manager:"Vikri Nur Rohim",pts:54,form:"3-4-3",chip:null,capt:"Haaland",gk:"Tzolakis (HUL)",def:"Gabriel, Guéhi, Shaw",mid:"M.Sangaré, Mbeumo, Szoboszlai, Cherki (VC)",fwd:"Wissa, Haaland (C), João Pedro",clubs:"Hit −8 · Wissa Cherki Sangaré",clubCounts:{"HUL":1,"ARS":1,"MCI":3,"MUN":2,"BRE":1,"LIV":1,"NEW":1,"CHE":1}},
+{rank:7,team:"Milenials",manager:"Indra Aprilian",pts:41,form:"4-5-1",chip:null,capt:"Cherki",gk:"Donnarumma (MCI)",def:"Kayode, Calafiori, Mendy, De Cuyper",mid:"Cherki (C), B.Fernandes (VC), M.Sangaré, Semenyo, Szoboszlai",fwd:"Thiago",clubs:"Cherki C",clubCounts:{"MCI":3,"BRE":3,"ARS":1,"HUL":1,"BHA":1,"MUN":1,"LIV":1}}
+]
 }
 };
+const CLUB_PLAYERS={"Andre Nosega Purnama": {"1": {"ARS": [{"name": "Raya", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Gabriel", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}, {"name": "Mosquera", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "CHE": [{"name": "João Pedro (C)", "minutes": 90, "points": 22, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2 → ×2 captain = 22 pts", "captain_multiplier": 2}, {"name": "Rogers", "minutes": 81, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (81') +2; Gol +5; Bonus +1"}], "EVE": [{"name": "Dewsbury-Hall", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Clean sheet +1; Bonus ×3 +3"}], "MCI": [{"name": "O'Reilly", "minutes": 62, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (62') +2"}], "MUN": [{"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}], "SUN": [{"name": "Brobbey", "minutes": 66, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (66') +2"}, {"name": "Ballard", "minutes": 90, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1; Kartu kuning -1"}, {"name": "E.Le Fée", "minutes": 79, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (79') +2"}]}, "2": {"ARS": [{"name": "Raya", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Gabriel", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}], "CHE": [{"name": "João Pedro (VC)", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2", "is_vice_captain": true}, {"name": "Rogers", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3"}], "EVE": [{"name": "Dewsbury-Hall", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}], "MUN": [{"name": "B.Fernandes (C)", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}], "SUN": [{"name": "Brobbey", "minutes": 63, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (63') +2"}, {"name": "Ballard", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "E.Le Fée", "minutes": 89, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (89') +2; Clean sheet +1"}], "TOT": [{"name": "Pedro Porro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}]}, "3": {"ARS": [{"name": "Raya", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Saves ×4 +1"}, {"name": "Mosquera", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Pedro Porro (TOT) naik dari bench menggantikan Mosquera", "replaced_by": "Pedro Porro"}, {"name": "Gabriel", "minutes": 90, "points": 2, "points_raw": 2, "status": "autosub", "note": "Gabriel naik dari bench menggantikan O'Reilly (MCI)", "points_breakdown": "Main ≥60 menit (90') +2"}], "BHA": [{"name": "Groß", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Rogers", "minutes": 86, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (86') +2; Gol +5; Kartu kuning -1"}], "EVE": [{"name": "Dewsbury-Hall", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 72, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2; Kartu kuning -1"}], "MCI": [{"name": "O'Reilly", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Gabriel (ARS) naik dari bench menggantikan O'Reilly", "replaced_by": "Gabriel"}, {"name": "Cherki (C)", "minutes": 65, "points": 6, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1 → ×2 captain = 6 pts", "captain_multiplier": 2}], "MUN": [{"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}], "SUN": [{"name": "Ballard", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×10 +2"}], "TOT": [{"name": "Pedro Porro", "minutes": 90, "points": 7, "points_raw": 7, "status": "autosub", "note": "Pedro Porro naik dari bench menggantikan Mosquera (ARS)", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1"}]}}, "Zava Anbiya": {"1": {"ARS": [{"name": "Calafiori", "minutes": 80, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (80') +2; Assist +3; Clean sheet +4"}, {"name": "Tzolis", "minutes": 75, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (75') +2; Assist +3; Clean sheet +1"}], "BHA": [{"name": "Verbruggen (VC)", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4", "is_vice_captain": true}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "LIV": [{"name": "Virgil (C)", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1; Kartu kuning -1; Defensive contribution ×11 +2 → ×2 captain = 4 pts", "captain_multiplier": 2}, {"name": "Szoboszlai", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Isak", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "MUN": [{"name": "Maguire", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Mbeumo", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}]}, "2": {"ARS": [{"name": "Calafiori", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +4; Bonus ×2 +2"}, {"name": "Tzolis", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}], "HUL": [{"name": "Tzolakis", "minutes": 90, "points": 10, "points_raw": 10, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Saves ×3 +1; Bonus ×3 +3"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}], "LIV": [{"name": "Virgil", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Szoboszlai (C)", "minutes": 90, "points": 8, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2 → ×2 captain = 8 pts", "captain_multiplier": 2}, {"name": "Isak", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}], "MUN": [{"name": "Maguire", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "minutes": 90, "points": 23, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3", "is_vice_captain": true}, {"name": "Mbeumo", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}]}, "3": {"ARS": [{"name": "Calafiori", "minutes": 66, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (66') +2"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "HUL": [{"name": "Tzolakis", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 72, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2; Kartu kuning -1"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Isak (C)", "minutes": 63, "points": 26, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (63') +2; Gol ×2 +8; Bonus ×3 +3 → ×2 captain = 26 pts", "captain_multiplier": 2}], "MCI": [{"name": "Gvardiol", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus ×2 +2"}], "MUN": [{"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}], "NFO": [{"name": "N.Williams", "minutes": 90, "points": 7, "points_raw": 7, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1"}], "SUN": [{"name": "Ballard", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×10 +2"}, {"name": "E.Le Fée", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}]}}, "Andri Varane": {"1": {"ARS": [{"name": "Calafiori", "minutes": 80, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (80') +2; Assist +3; Clean sheet +4"}, {"name": "Tzolis", "minutes": 75, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (75') +2; Assist +3; Clean sheet +1"}], "BHA": [{"name": "Verbruggen", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}], "LEE": [{"name": "Muharemović", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Calvert-Lewin", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}], "MCI": [{"name": "Haaland (C)", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}], "MUN": [{"name": "Maguire", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}], "SUN": [{"name": "E.Le Fée", "minutes": 79, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (79') +2"}]}, "2": {"ARS": [{"name": "Calafiori", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +4; Bonus ×2 +2"}, {"name": "Tzolis", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}], "LEE": [{"name": "Muharemović", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×19 +2"}, {"name": "Stach", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×16 +2"}, {"name": "Calvert-Lewin", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}], "MCI": [{"name": "Haaland (VC)", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3", "is_vice_captain": true}], "MUN": [{"name": "Maguire", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kebobolan ×2 -1"}, {"name": "B.Fernandes (C)", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}], "TOT": [{"name": "Kinsky", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}]}, "3": {"BHA": [{"name": "De Cuyper", "minutes": 76, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (76') +2; Assist +3; Kartu kuning -1"}], "BRE": [{"name": "Thiago", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Kelleher", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "LIV": [{"name": "Wirtz", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Isak", "minutes": 63, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (63') +2; Gol ×2 +8; Bonus ×3 +3"}], "MCI": [{"name": "Gvardiol", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus ×2 +2"}, {"name": "Cherki (VC)", "minutes": 65, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1", "is_vice_captain": true}, {"name": "Haaland (C)", "minutes": 90, "points": 18, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×2 captain = 18 pts", "captain_multiplier": 2}], "NEW": [{"name": "Hall", "minutes": 89, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (89') +2; Assist +3; Kebobolan ×2 -1"}, {"name": "Elanga", "minutes": 76, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (76') +2; Kartu kuning -1"}], "NFO": [{"name": "Gibbs-White", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}]}}, "Vikri Nur Rohim": {"1": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}, {"name": "Rice", "minutes": 67, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (67') +2; Clean sheet +1"}], "BHA": [{"name": "Verbruggen", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}], "MCI": [{"name": "Guéhi", "minutes": 90, "points": 10, "points_raw": 10, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +6; Bonus ×2 +2"}, {"name": "Foden", "minutes": 81, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (81') +2; Kartu kuning -1"}, {"name": "Haaland (C)", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}], "MUN": [{"name": "Shaw", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Mbeumo (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}]}, "2": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "Rice", "minutes": 84, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (84') +2; Clean sheet +1; Defensive contribution ×12 +2"}], "BHA": [{"name": "Verbruggen", "minutes": 90, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×4 -2"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}], "MCI": [{"name": "Guéhi", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Foden", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist ×2 +6; Bonus +1"}, {"name": "Haaland (C)", "minutes": 90, "points": 26, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3 → ×2 captain = 26 pts", "captain_multiplier": 2}], "MUN": [{"name": "Shaw", "minutes": 72, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2"}, {"name": "Mbeumo (VC)", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2", "is_vice_captain": true}]}, "3": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "BRE": [{"name": "M.Sangaré", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "HUL": [{"name": "Tzolakis", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}], "MCI": [{"name": "Guéhi", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus ×2 +2"}, {"name": "Cherki (VC)", "minutes": 65, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1", "is_vice_captain": true}, {"name": "Haaland (C)", "minutes": 90, "points": 18, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×2 captain = 18 pts", "captain_multiplier": 2}], "MUN": [{"name": "Shaw", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kartu kuning -1"}, {"name": "Mbeumo", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}], "NEW": [{"name": "Wissa", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}]}}, "Rendy P": {"1": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}], "COV": [{"name": "Thomas", "minutes": 90, "points": 3, "points_raw": 3, "status": "autosub", "note": "Thomas naik dari bench menggantikan Pedro Porro (TOT)", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×3 -1; Defensive contribution ×10 +2"}], "CRY": [{"name": "Hughes", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}], "MCI": [{"name": "Ndiaye", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +1; Bonus +1; Defensive contribution ×12 +2"}, {"name": "Haaland (C)", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}], "MUN": [{"name": "Shaw", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Mbeumo", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "TOT": [{"name": "Kinsky", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×3 -1; Saves ×5 +1"}, {"name": "Pedro Porro", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Thomas (COV) naik dari bench menggantikan Pedro Porro", "replaced_by": "Thomas"}]}, "2": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}], "COV": [{"name": "Thomas", "minutes": 77, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (77') +2; Clean sheet +4; Bonus ×2 +2"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}], "MCI": [{"name": "Ndiaye", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}, {"name": "Haaland (VC)", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3", "is_vice_captain": true}], "MUN": [{"name": "Shaw", "minutes": 72, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2"}, {"name": "B.Fernandes (C)", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Mbeumo", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}], "TOT": [{"name": "Kinsky", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Pedro Porro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}]}, "3": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "BHA": [{"name": "Verbruggen", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Saves ×3 +1"}, {"name": "Groß", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "HUL": [{"name": "Egan", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}], "MCI": [{"name": "Haaland (C)", "minutes": 90, "points": 27, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×3 captain = 27 pts", "captain_multiplier": 3}], "MUN": [{"name": "Shaw", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kartu kuning -1"}, {"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Mbeumo", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}], "TOT": [{"name": "Pedro Porro", "minutes": 90, "points": 7, "points_raw": 7, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1"}]}}, "Muhammad Fariz Azhari": {"1": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}], "BHA": [{"name": "Groß", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}], "CRY": [{"name": "Mitchell", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}], "MCI": [{"name": "Haaland (C)", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}], "MUN": [{"name": "Shaw", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Mbeumo", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "TOT": [{"name": "Kinsky", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×3 -1; Saves ×5 +1"}]}, "2": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}], "BHA": [{"name": "Groß", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Bonus ×3 +3"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}], "HUL": [{"name": "Egan", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1; Defensive contribution ×13 +2"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}], "MCI": [{"name": "Haaland (VC)", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3", "is_vice_captain": true}], "MUN": [{"name": "Shaw", "minutes": 72, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2"}, {"name": "B.Fernandes (C)", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Mbeumo", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}], "TOT": [{"name": "Kinsky", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}]}, "3": {"ARS": [{"name": "Gabriel", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "BHA": [{"name": "Verbruggen", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Saves ×3 +1"}, {"name": "Groß", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "CHE": [{"name": "João Pedro", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}], "HUL": [{"name": "Egan", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}], "LEE": [{"name": "Calvert-Lewin", "minutes": 72, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2; Kartu kuning -1"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}], "MCI": [{"name": "Cherki (VC)", "minutes": 65, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1", "is_vice_captain": true}, {"name": "Haaland (C)", "minutes": 90, "points": 27, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×3 captain = 27 pts", "captain_multiplier": 3}], "MUN": [{"name": "B.Fernandes", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}], "NEW": [{"name": "Dedić", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}]}}, "Indra Aprilian": {"2": {"ARS": [{"name": "Calafiori", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +4; Bonus ×2 +2"}, {"name": "Gyökeres", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Tarkowski (EVE) naik dari bench menggantikan Gyökeres", "replaced_by": "Tarkowski"}], "BHA": [{"name": "De Cuyper", "minutes": 90, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×4 -2"}], "BRE": [{"name": "Thiago", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "M.Sangaré", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×14 +2"}, {"name": "Kayode", "minutes": 87, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (87') +2"}], "EVE": [{"name": "Tarkowski", "minutes": 90, "points": 12, "points_raw": 12, "status": "autosub", "note": "Tarkowski naik dari bench menggantikan Gyökeres (ARS)", "points_breakdown": "Main ≥60 menit (90') +2; Gol +6; Bonus ×2 +2; Defensive contribution ×10 +2"}], "HUL": [{"name": "Mendy", "minutes": 58, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (58') +1"}], "LIV": [{"name": "Szoboszlai (VC)", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2", "is_vice_captain": true}], "MUN": [{"name": "Mbeumo", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}, {"name": "B.Fernandes (C)", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Lammens", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1; Saves ×3 +1"}]}, "3": {"ARS": [{"name": "Calafiori", "minutes": 66, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (66') +2"}], "BHA": [{"name": "De Cuyper", "minutes": 76, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (76') +2; Assist +3; Kartu kuning -1"}], "BRE": [{"name": "Thiago", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "M.Sangaré", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}, {"name": "Kayode", "minutes": 45, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1"}], "HUL": [{"name": "Mendy", "minutes": 70, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (70') +2; Clean sheet +4; Defensive contribution ×10 +2"}], "LIV": [{"name": "Szoboszlai", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}], "MCI": [{"name": "Donnarumma", "minutes": 90, "points": 7, "points_raw": 7, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Saves ×3 +1"}, {"name": "Semenyo", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +1"}, {"name": "Cherki (C)", "minutes": 65, "points": 6, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1 → ×2 captain = 6 pts", "captain_multiplier": 2}], "MUN": [{"name": "B.Fernandes (VC)", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}]}}};
+const LINEUP_SEASON={"Andre Nosega Purnama": {"manager": "Andre Nosega Purnama", "team": "King Polenk", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 3, "total_xi_slots": 33, "total_points": 199}, "by_gameweek": [{"gameweek": 1, "label": "Gameweek 1", "xi_points": 66, "formation": "4-4-2", "captain": "João Pedro", "chip": null, "transfer_cost": 0, "players": [{"name": "Raya", "club": "ARS", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Ballard", "club": "SUN", "pos": "DEF", "minutes": 90, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1; Kartu kuning -1"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}, {"name": "Mosquera", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "O'Reilly", "club": "MCI", "pos": "DEF", "minutes": 62, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (62') +2"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Dewsbury-Hall", "club": "EVE", "pos": "MID", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Clean sheet +1; Bonus ×3 +3"}, {"name": "E.Le Fée", "club": "SUN", "pos": "MID", "minutes": 79, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (79') +2"}, {"name": "Rogers", "club": "CHE", "pos": "MID", "minutes": 81, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (81') +2; Gol +5; Bonus +1"}, {"name": "Brobbey", "club": "SUN", "pos": "FWD", "minutes": 66, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (66') +2"}, {"name": "João Pedro (C)", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 22, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2 → ×2 captain = 22 pts", "captain_multiplier": 2}]}, {"gameweek": 2, "label": "Gameweek 2", "xi_points": 98, "formation": "3-4-3", "captain": "B.Fernandes", "chip": null, "transfer_cost": 0, "players": [{"name": "Raya", "club": "ARS", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Ballard", "club": "SUN", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "Pedro Porro", "club": "TOT", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (C)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Dewsbury-Hall", "club": "EVE", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "E.Le Fée", "club": "SUN", "pos": "MID", "minutes": 89, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (89') +2; Clean sheet +1"}, {"name": "Rogers", "club": "CHE", "pos": "MID", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3"}, {"name": "Brobbey", "club": "SUN", "pos": "FWD", "minutes": 63, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (63') +2"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}, {"name": "João Pedro (VC)", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2", "is_vice_captain": true}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 35, "formation": "3-5-2", "captain": "Cherki", "chip": null, "transfer_cost": 0, "players": [{"name": "Raya", "club": "ARS", "pos": "GK", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Saves ×4 +1"}, {"name": "Ballard", "club": "SUN", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×10 +2"}, {"name": "Mosquera", "club": "ARS", "pos": "DEF", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Pedro Porro (TOT) naik dari bench menggantikan Mosquera", "replaced_by": "Pedro Porro"}, {"name": "O'Reilly", "club": "MCI", "pos": "DEF", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Gabriel (ARS) naik dari bench menggantikan O'Reilly", "replaced_by": "Gabriel"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Cherki (C)", "club": "MCI", "pos": "MID", "minutes": 65, "points": 6, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1 → ×2 captain = 6 pts", "captain_multiplier": 2}, {"name": "Dewsbury-Hall", "club": "EVE", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Groß", "club": "BHA", "pos": "MID", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Rogers", "club": "CHE", "pos": "MID", "minutes": 86, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (86') +2; Gol +5; Kartu kuning -1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 72, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2; Kartu kuning -1"}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 2, "points_raw": 2, "status": "autosub", "note": "Gabriel naik dari bench menggantikan O'Reilly (MCI)", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Pedro Porro", "club": "TOT", "pos": "DEF", "minutes": 90, "points": 7, "points_raw": 7, "status": "autosub", "note": "Pedro Porro naik dari bench menggantikan Mosquera (ARS)", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1"}]}]}, "Zava Anbiya": {"manager": "Zava Anbiya", "team": "SCOUSER", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 3, "total_xi_slots": 33, "total_points": 219}, "by_gameweek": [{"gameweek": 1, "label": "Gameweek 1", "xi_points": 58, "formation": "3-4-3", "captain": "Virgil", "chip": "bboost", "transfer_cost": 0, "players": [{"name": "Verbruggen (VC)", "club": "BHA", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4", "is_vice_captain": true}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 80, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (80') +2; Assist +3; Clean sheet +4"}, {"name": "Maguire", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Virgil (C)", "club": "LIV", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1; Kartu kuning -1; Defensive contribution ×11 +2 → ×2 captain = 4 pts", "captain_multiplier": 2}, {"name": "B.Fernandes", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Tzolis", "club": "ARS", "pos": "MID", "minutes": 75, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (75') +2; Assist +3; Clean sheet +1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Isak", "club": "LIV", "pos": "FWD", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}]}, {"gameweek": 2, "label": "Gameweek 2", "xi_points": 93, "formation": "3-4-3", "captain": "Szoboszlai", "chip": null, "transfer_cost": 0, "players": [{"name": "Tzolakis", "club": "HUL", "pos": "GK", "minutes": 90, "points": 10, "points_raw": 10, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Saves ×3 +1; Bonus ×3 +3"}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +4; Bonus ×2 +2"}, {"name": "Maguire", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kebobolan ×2 -1"}, {"name": "Virgil", "club": "LIV", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 23, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3", "is_vice_captain": true}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}, {"name": "Szoboszlai (C)", "club": "LIV", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2 → ×2 captain = 8 pts", "captain_multiplier": 2}, {"name": "Tzolis", "club": "ARS", "pos": "MID", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}, {"name": "Isak", "club": "LIV", "pos": "FWD", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 68, "formation": "4-3-3", "captain": "Isak", "chip": null, "transfer_cost": 0, "players": [{"name": "Tzolakis", "club": "HUL", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Ballard", "club": "SUN", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×10 +2"}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 66, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (66') +2"}, {"name": "Gvardiol", "club": "MCI", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus ×2 +2"}, {"name": "N.Williams", "club": "NFO", "pos": "DEF", "minutes": 90, "points": 7, "points_raw": 7, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "E.Le Fée", "club": "SUN", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 72, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2; Kartu kuning -1"}, {"name": "Isak (C)", "club": "LIV", "pos": "FWD", "minutes": 63, "points": 26, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (63') +2; Gol ×2 +8; Bonus ×3 +3 → ×2 captain = 26 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}]}]}, "Andri Varane": {"manager": "Andri Varane", "team": "sinar muda fc", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 3, "total_xi_slots": 33, "total_points": 221}, "by_gameweek": [{"gameweek": 1, "label": "Gameweek 1", "xi_points": 56, "formation": "3-4-3", "captain": "Haaland", "chip": null, "transfer_cost": 0, "players": [{"name": "Verbruggen", "club": "BHA", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 80, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (80') +2; Assist +3; Clean sheet +4"}, {"name": "Maguire", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Muharemović", "club": "LEE", "pos": "DEF", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "E.Le Fée", "club": "SUN", "pos": "MID", "minutes": 79, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (79') +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Tzolis", "club": "ARS", "pos": "MID", "minutes": 75, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (75') +2; Assist +3; Clean sheet +1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}]}, {"gameweek": 2, "label": "Gameweek 2", "xi_points": 104, "formation": "3-4-3", "captain": "B.Fernandes", "chip": null, "transfer_cost": 0, "players": [{"name": "Kinsky", "club": "TOT", "pos": "GK", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +4; Bonus ×2 +2"}, {"name": "Maguire", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kebobolan ×2 -1"}, {"name": "Muharemović", "club": "LEE", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×19 +2"}, {"name": "B.Fernandes (C)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Stach", "club": "LEE", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×16 +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}, {"name": "Tzolis", "club": "ARS", "pos": "MID", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}, {"name": "Haaland (VC)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3", "is_vice_captain": true}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 61, "formation": "3-4-3", "captain": "Haaland", "chip": "freehit", "transfer_cost": 0, "players": [{"name": "Kelleher", "club": "BRE", "pos": "GK", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "De Cuyper", "club": "BHA", "pos": "DEF", "minutes": 76, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (76') +2; Assist +3; Kartu kuning -1"}, {"name": "Gvardiol", "club": "MCI", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus ×2 +2"}, {"name": "Hall", "club": "NEW", "pos": "DEF", "minutes": 89, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (89') +2; Assist +3; Kebobolan ×2 -1"}, {"name": "Cherki (VC)", "club": "MCI", "pos": "MID", "minutes": 65, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1", "is_vice_captain": true}, {"name": "Elanga", "club": "NEW", "pos": "MID", "minutes": 76, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (76') +2; Kartu kuning -1"}, {"name": "Gibbs-White", "club": "NFO", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Wirtz", "club": "LIV", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 18, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×2 captain = 18 pts", "captain_multiplier": 2}, {"name": "Isak", "club": "LIV", "pos": "FWD", "minutes": 63, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (63') +2; Gol ×2 +8; Bonus ×3 +3"}, {"name": "Thiago", "club": "BRE", "pos": "FWD", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}]}]}, "Vikri Nur Rohim": {"manager": "Vikri Nur Rohim", "team": "Betelguese", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 3, "total_xi_slots": 33, "total_points": 182}, "by_gameweek": [{"gameweek": 1, "label": "Gameweek 1", "xi_points": 52, "formation": "3-4-3", "captain": "Haaland", "chip": null, "transfer_cost": 0, "players": [{"name": "Verbruggen", "club": "BHA", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}, {"name": "Guéhi", "club": "MCI", "pos": "DEF", "minutes": 90, "points": 10, "points_raw": 10, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +6; Bonus ×2 +2"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Foden", "club": "MCI", "pos": "MID", "minutes": 81, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (81') +2; Kartu kuning -1"}, {"name": "Mbeumo (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Rice", "club": "ARS", "pos": "MID", "minutes": 67, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (67') +2; Clean sheet +1"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}]}, {"gameweek": 2, "label": "Gameweek 2", "xi_points": 84, "formation": "3-4-3", "captain": "Haaland", "chip": null, "transfer_cost": 0, "players": [{"name": "Verbruggen", "club": "BHA", "pos": "GK", "minutes": 90, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×4 -2"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "Guéhi", "club": "MCI", "pos": "DEF", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 72, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2"}, {"name": "Foden", "club": "MCI", "pos": "MID", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist ×2 +6; Bonus +1"}, {"name": "Mbeumo (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2", "is_vice_captain": true}, {"name": "Rice", "club": "ARS", "pos": "MID", "minutes": 84, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (84') +2; Clean sheet +1; Defensive contribution ×12 +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 26, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3 → ×2 captain = 26 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 54, "formation": "3-4-3", "captain": "Haaland", "chip": null, "transfer_cost": -8, "players": [{"name": "Tzolakis", "club": "HUL", "pos": "GK", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Guéhi", "club": "MCI", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus ×2 +2"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kartu kuning -1"}, {"name": "Cherki (VC)", "club": "MCI", "pos": "MID", "minutes": 65, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1", "is_vice_captain": true}, {"name": "M.Sangaré", "club": "BRE", "pos": "MID", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 18, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×2 captain = 18 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Wissa", "club": "NEW", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}]}]}, "Rendy P": {"manager": "Rendy P", "team": "Parpas", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 3, "total_xi_slots": 33, "total_points": 218}, "by_gameweek": [{"gameweek": 1, "label": "Gameweek 1", "xi_points": 47, "formation": "3-5-2", "captain": "Haaland", "chip": null, "transfer_cost": 0, "players": [{"name": "Kinsky", "club": "TOT", "pos": "GK", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×3 -1; Saves ×5 +1"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}, {"name": "Pedro Porro", "club": "TOT", "pos": "DEF", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Thomas (COV) naik dari bench menggantikan Pedro Porro", "replaced_by": "Thomas"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Hughes", "club": "CRY", "pos": "MID", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Ndiaye", "club": "MCI", "pos": "MID", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +1; Bonus +1; Defensive contribution ×12 +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}, {"name": "Thomas", "club": "COV", "pos": "DEF", "minutes": 90, "points": 3, "points_raw": 3, "status": "autosub", "note": "Thomas naik dari bench menggantikan Pedro Porro (TOT)", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×3 -1; Defensive contribution ×10 +2"}]}, {"gameweek": 2, "label": "Gameweek 2", "xi_points": 107, "formation": "4-4-2", "captain": "B.Fernandes", "chip": null, "transfer_cost": 0, "players": [{"name": "Kinsky", "club": "TOT", "pos": "GK", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "Pedro Porro", "club": "TOT", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 72, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2"}, {"name": "Thomas", "club": "COV", "pos": "DEF", "minutes": 77, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (77') +2; Clean sheet +4; Bonus ×2 +2"}, {"name": "B.Fernandes (C)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}, {"name": "Ndiaye", "club": "MCI", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}, {"name": "Haaland (VC)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3", "is_vice_captain": true}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 64, "formation": "4-4-2", "captain": "Haaland", "chip": "3xc", "transfer_cost": 0, "players": [{"name": "Verbruggen", "club": "BHA", "pos": "GK", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Saves ×3 +1"}, {"name": "Egan", "club": "HUL", "pos": "DEF", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Pedro Porro", "club": "TOT", "pos": "DEF", "minutes": 90, "points": 7, "points_raw": 7, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Kartu kuning -1"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Groß", "club": "BHA", "pos": "MID", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 27, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×3 captain = 27 pts", "captain_multiplier": 3}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}]}]}, "Muhammad Fariz Azhari": {"manager": "Muhammad Fariz Azhari", "team": "Giri - giri", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 3, "total_xi_slots": 33, "total_points": 213}, "by_gameweek": [{"gameweek": 1, "label": "Gameweek 1", "xi_points": 39, "formation": "3-4-3", "captain": "Haaland", "chip": null, "transfer_cost": 0, "players": [{"name": "Kinsky", "club": "TOT", "pos": "GK", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×3 -1; Saves ×5 +1"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 5, "points_raw": 5, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Kartu kuning -1"}, {"name": "Mitchell", "club": "CRY", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Groß", "club": "BHA", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1; Kartu kuning -1"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Bonus +1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 4, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2 → ×2 captain = 4 pts", "captain_multiplier": 2}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Bonus ×2 +2"}]}, {"gameweek": 2, "label": "Gameweek 2", "xi_points": 124, "formation": "3-4-3", "captain": "B.Fernandes", "chip": null, "transfer_cost": 0, "players": [{"name": "Kinsky", "club": "TOT", "pos": "GK", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Egan", "club": "HUL", "pos": "DEF", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Bonus +1; Defensive contribution ×13 +2"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "Shaw", "club": "MUN", "pos": "DEF", "minutes": 72, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2"}, {"name": "B.Fernandes (C)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "Groß", "club": "BHA", "pos": "MID", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Bonus ×3 +3"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 90, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×2 +2"}, {"name": "Haaland (VC)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 13, "points_raw": 13, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×2 +8; Bonus ×3 +3", "is_vice_captain": true}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 9, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Assist +3; Gol bunuh diri -2; Bonus ×2 +2"}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 50, "formation": "3-4-3", "captain": "Haaland", "chip": "3xc", "transfer_cost": 0, "players": [{"name": "Verbruggen", "club": "BHA", "pos": "GK", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Saves ×3 +1"}, {"name": "Dedić", "club": "NEW", "pos": "DEF", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1"}, {"name": "Egan", "club": "HUL", "pos": "DEF", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4"}, {"name": "Gabriel", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "B.Fernandes", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Cherki (VC)", "club": "MCI", "pos": "MID", "minutes": 65, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1", "is_vice_captain": true}, {"name": "Groß", "club": "BHA", "pos": "MID", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Calvert-Lewin", "club": "LEE", "pos": "FWD", "minutes": 72, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (72') +2; Kartu kuning -1"}, {"name": "Haaland (C)", "club": "MCI", "pos": "FWD", "minutes": 90, "points": 27, "points_raw": 9, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +4; Bonus ×3 +3 → ×3 captain = 27 pts", "captain_multiplier": 3}, {"name": "João Pedro", "club": "CHE", "pos": "FWD", "minutes": 90, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kartu kuning -1"}]}]}, "Indra Aprilian": {"manager": "Indra Aprilian", "team": "Milenials", "scope": "Starting XI only (pos 1–11 yang dipilih)", "season_summary": {"gameweeks": 2, "total_xi_slots": 22, "total_points": 136}, "by_gameweek": [{"gameweek": 2, "label": "Gameweek 2", "xi_points": 95, "formation": "4-4-2", "captain": "B.Fernandes", "chip": null, "transfer_cost": 0, "players": [{"name": "Lammens", "club": "MUN", "pos": "GK", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×2 -1; Saves ×3 +1"}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +4; Bonus ×2 +2"}, {"name": "De Cuyper", "club": "BHA", "pos": "DEF", "minutes": 90, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Kebobolan ×4 -2"}, {"name": "Kayode", "club": "BRE", "pos": "DEF", "minutes": 87, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (87') +2"}, {"name": "Mendy", "club": "HUL", "pos": "DEF", "minutes": 58, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (58') +1"}, {"name": "B.Fernandes (C)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 46, "points_raw": 23, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol ×3 +15; Assist +3; Bonus ×3 +3 → ×2 captain = 46 pts", "captain_multiplier": 2}, {"name": "M.Sangaré", "club": "BRE", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×14 +2"}, {"name": "Mbeumo", "club": "MUN", "pos": "MID", "minutes": 90, "points": 11, "points_raw": 11, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Gol +5; Assist +3; Kartu kuning -1; Bonus ×2 +2"}, {"name": "Szoboszlai (VC)", "club": "LIV", "pos": "MID", "minutes": 90, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Defensive contribution ×13 +2", "is_vice_captain": true}, {"name": "Gyökeres", "club": "ARS", "pos": "FWD", "minutes": 0, "points": 0, "points_raw": 0, "status": "selected_no_play", "note": "Tarkowski (EVE) naik dari bench menggantikan Gyökeres", "replaced_by": "Tarkowski"}, {"name": "Thiago", "club": "BRE", "pos": "FWD", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}, {"name": "Tarkowski", "club": "EVE", "pos": "DEF", "minutes": 90, "points": 12, "points_raw": 12, "status": "autosub", "note": "Tarkowski naik dari bench menggantikan Gyökeres (ARS)", "points_breakdown": "Main ≥60 menit (90') +2; Gol +6; Bonus ×2 +2; Defensive contribution ×10 +2"}]}, {"gameweek": 3, "label": "Gameweek 3", "xi_points": 41, "formation": "4-5-1", "captain": "Cherki", "chip": null, "transfer_cost": 0, "players": [{"name": "Donnarumma", "club": "MCI", "pos": "GK", "minutes": 90, "points": 7, "points_raw": 7, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +4; Saves ×3 +1"}, {"name": "Calafiori", "club": "ARS", "pos": "DEF", "minutes": 66, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (66') +2"}, {"name": "De Cuyper", "club": "BHA", "pos": "DEF", "minutes": 76, "points": 4, "points_raw": 4, "status": "started", "points_breakdown": "Main ≥60 menit (76') +2; Assist +3; Kartu kuning -1"}, {"name": "Kayode", "club": "BRE", "pos": "DEF", "minutes": 45, "points": 1, "points_raw": 1, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1"}, {"name": "Mendy", "club": "HUL", "pos": "DEF", "minutes": 70, "points": 8, "points_raw": 8, "status": "started", "points_breakdown": "Main ≥60 menit (70') +2; Clean sheet +4; Defensive contribution ×10 +2"}, {"name": "B.Fernandes (VC)", "club": "MUN", "pos": "MID", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2", "is_vice_captain": true}, {"name": "Cherki (C)", "club": "MCI", "pos": "MID", "minutes": 65, "points": 6, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (65') +2; Clean sheet +1 → ×2 captain = 6 pts", "captain_multiplier": 2}, {"name": "M.Sangaré", "club": "BRE", "pos": "MID", "minutes": 45, "points": 0, "points_raw": 0, "status": "started", "points_breakdown": "Main ≥60 menit (45') +1; Kartu kuning -1"}, {"name": "Semenyo", "club": "MCI", "pos": "MID", "minutes": 90, "points": 6, "points_raw": 6, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Assist +3; Clean sheet +1"}, {"name": "Szoboszlai", "club": "LIV", "pos": "MID", "minutes": 90, "points": 3, "points_raw": 3, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2; Clean sheet +1"}, {"name": "Thiago", "club": "BRE", "pos": "FWD", "minutes": 90, "points": 2, "points_raw": 2, "status": "started", "points_breakdown": "Main ≥60 menit (90') +2"}]}]}};
+
+
+
 
 function getAllGWs(){return Object.keys(LEAGUE_DATA).map(Number).sort((a,b)=>a-b)}
 function buildWeeklyHistory(){return getAllGWs().map(gw=>{const d=LEAGUE_DATA[gw];return{gw,first:d.first,last:d.last}})}
@@ -305,6 +328,16 @@ function buildAccum(){
 function getManagerList(){return LEAGUE_DATA[Math.max(...getAllGWs())].standings.map(s=>({manager:s.manager,team:s.team}))}
 function getCumulativeClubCounts(managerName){
   const totals={};
+  if(typeof CLUB_PLAYERS!=='undefined' && CLUB_PLAYERS[managerName]){
+    Object.values(CLUB_PLAYERS[managerName]).forEach(gwMap=>{
+      Object.entries(gwMap).forEach(([club,players])=>{
+        // only selected XI (exclude autosub entries from count)
+        const n=players.filter(p=>p.status!=='autosub').length;
+        if(n) totals[club]=(totals[club]||0)+n;
+      });
+    });
+    return Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  }
   getAllGWs().forEach(gw=>{
     const squad=LEAGUE_DATA[gw].squads.find(s=>s.manager===managerName);
     if(!squad||!squad.clubCounts)return;
@@ -312,6 +345,8 @@ function getCumulativeClubCounts(managerName){
   });
   return Object.entries(totals).sort((a,b)=>b[1]-a[1]);
 }
+
+
 function movementHtml(rank,lastRank){
   if(!lastRank||lastRank===0)return'<span class="movement-same">—</span>';
   const diff=lastRank-rank;
@@ -319,12 +354,10 @@ function movementHtml(rank,lastRank){
   if(diff<0)return`<span class="movement-down">↓ ${Math.abs(diff)}</span>`;
   return'<span class="movement-same">—</span>';
 }
-
 let pointsChartInst=null,hitsChartInst=null,clubChartInst=null,benchChartInst=null;
 let pointsChartSeries=[],pointsChartLabels=[];
 let pointsFullSeries=[],pointsFullLabels=[],pointsHybridFocused=false;
-const HYBRID_FOCUS_N=5; // fokus ke N gameweek terakhir
-
+const HYBRID_FOCUS_N=5;
 function rangeYConfig(valuesList){
   const all=valuesList.flat();
   const min=Math.min(...all),max=Math.max(...all);
@@ -332,16 +365,14 @@ function rangeYConfig(valuesList){
   return {min:Math.max(0,Math.floor((min-pad)/10)*10),max:Math.ceil((max+pad)/10)*10};
 }
 let animRafId=null,animPlaying=false;
-
 function easeInOutQuad(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
-
 const pointsTipPlugin={
   id:'pointsTipDots',
   afterDatasetsDraw(chart){
     if(chart.canvas.id!=='pointsChart'||!pointsChartSeries.length)return;
     const finalX=pointsChartLabels.length-1;
     const progress=chart.$progress??finalX;
-    if(progress>=finalX-1e-6)return; // diam/selesai: biar marker asli Chart.js yang tampil, bukan dot custom
+    if(progress>=finalX-1e-6)return;
     const xScale=chart.scales.x,yScale=chart.scales.y,ctx=chart.ctx;
     pointsChartSeries.forEach(s=>{
       const vals=s.values;
@@ -360,7 +391,6 @@ const pointsTipPlugin={
     });
   }
 };
-
 function getAccumBench(){
   const totals={};
   getAllGWs().forEach(gw=>{
@@ -369,18 +399,75 @@ function getAccumBench(){
   });
   return totals;
 }
-
-function renderClubChart(managerName){
-  const entries=getCumulativeClubCounts(managerName);
-  if(!entries.length){if(clubChartInst)clubChartInst.destroy();return}
-  if(clubChartInst)clubChartInst.destroy();
-  clubChartInst=new Chart(document.getElementById('clubChart'),{
-    type:'bar',
-    data:{labels:entries.map(e=>e[0]),datasets:[{label:'Jumlah pemain',data:entries.map(e=>e[1]),backgroundColor:'#00FF87',borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' pemain'}}},
-      scales:{y:{beginAtZero:true,ticks:{stepSize:1},title:{display:true,text:'Jumlah Pemain'},grid:{color:'rgba(255,255,255,0.06)'}},x:{title:{display:true,text:'Klub'},grid:{display:false}}}}
+function getClubGwBreakdown(managerName, clubCode){
+  const rows=[];
+  if(typeof CLUB_PLAYERS!=='undefined' && CLUB_PLAYERS[managerName]){
+    getAllGWs().forEach(gw=>{
+      const gwMap=CLUB_PLAYERS[managerName][String(gw)];
+      if(!gwMap)return;
+      const players=gwMap[clubCode]||[];
+      if(!players.length)return;
+      const selected=players.filter(p=>p.status!=='autosub');
+      rows.push({
+        gw:gw,
+        label:LEAGUE_DATA[gw].label,
+        count:selected.length,
+        players:players
+      });
+    });
+    return rows;
+  }
+  getAllGWs().forEach(gw=>{
+    const squad=LEAGUE_DATA[gw].squads.find(s=>s.manager===managerName);
+    if(!squad||!squad.clubCounts)return;
+    const n=squad.clubCounts[clubCode]||0;
+    if(n>0) rows.push({gw:gw,count:n,players:[],label:LEAGUE_DATA[gw].label});
   });
+  return rows;
 }
+function openClubDetail(managerName, clubCode, clubName, total){
+  const byGw=getClubGwBreakdown(managerName, clubCode);
+  const payload={
+    manager:managerName,
+    club:clubName,
+    club_code:clubCode,
+    total_slots:total,
+    note:"total_slots = Starting XI yang dipilih (bukan autosub). points = poin yang masuk skor manajer (sudah × C/VC/TC). points_raw = poin mentah pemain. points_breakdown = sumber poin.",
+    by_gameweek:byGw.map(r=>({
+      gameweek:r.gw,
+      label:r.label,
+      slots:r.count,
+      players:r.players
+    }))
+  };
+  document.getElementById('clubModalTitle').textContent=clubName+' · '+managerName;
+  document.getElementById('clubModalBody').textContent=JSON.stringify(payload,null,2);
+  document.getElementById('clubModal').classList.add('open');
+}
+function closeClubModal(){document.getElementById('clubModal').classList.remove('open')}
+function renderClubChart(managerName){
+  const CLUB_NAMES={"ARS":"Arsenal","AVL":"Aston Villa","BOU":"Bournemouth","BRE":"Brentford","BHA":"Brighton","CHE":"Chelsea","CRY":"Crystal Palace","EVE":"Everton","FUL":"Fulham","HUL":"Hull City","IPS":"Ipswich","LEE":"Leeds","LIV":"Liverpool","MCI":"Manchester City","MUN":"Manchester United","NEW":"Newcastle","NFO":"Nott'm Forest","SUN":"Sunderland","TOT":"Tottenham","WHU":"West Ham","COV":"Coventry"};
+  const entries=getCumulativeClubCounts(managerName);
+  const el=document.getElementById('clubTable');
+  if(!el)return;
+  if(!entries.length){el.innerHTML='<p style="color:var(--muted);font-size:0.85rem">Belum ada data.</p>';return}
+  let h='<table><thead><tr><th style="text-align:left;padding-left:1rem">Nama Klub</th><th>Jumlah Pemain</th></tr></thead><tbody>';
+  entries.forEach(([code,n],i)=>{
+    const name=CLUB_NAMES[code]||code;
+    const cls=i===0?'rank-1':i<3?'rank-2':'';
+    h+=`<tr class="${cls}"><td style="text-align:left;padding-left:1rem"><strong>${name}</strong> <span style="color:var(--muted);font-size:0.75rem">(${code})</span></td><td><button type="button" class="club-count-btn" data-mgr="${managerName.replace(/"/g,'&quot;')}" data-code="${code}" data-name="${name.replace(/"/g,'&quot;')}" data-total="${n}" title="Lihat breakdown per GW">${n}</button></td></tr>`;
+  });
+  h+='</tbody></table>';
+  el.innerHTML=h;
+  el.querySelectorAll('.club-count-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      openClubDetail(btn.dataset.mgr, btn.dataset.code, btn.dataset.name, parseInt(btn.dataset.total,10));
+    });
+  });
+  if(typeof clubChartInst!=='undefined'&&clubChartInst){try{clubChartInst.destroy()}catch(e){} clubChartInst=null}
+}
+
+
 
 function buildPointsChart(forceOverview){
   if(pointsChartInst)pointsChartInst.destroy();
@@ -392,9 +479,9 @@ function buildPointsChart(forceOverview){
     const allValues=pointsFullSeries.flatMap(s=>s.values);
     yCfg={beginAtZero:true,min:0,max:Math.ceil(Math.max(...allValues)/20)*20+20};
   }else{
-    const totalPts=pointsFullLabels.length; // termasuk 'Start'
+    const totalPts=pointsFullLabels.length;
     const n=Math.min(HYBRID_FOCUS_N,totalPts-1);
-    const startIdx=totalPts-n; // index ke pointsFullLabels/values, exclusive dari Start kalau memungkinkan
+    const startIdx=totalPts-n;
     labels=pointsFullLabels.slice(startIdx);
     seriesForView=pointsFullSeries.map(s=>({label:s.label,color:s.color,values:s.values.slice(startIdx)}));
     yCfg=Object.assign({beginAtZero:false},rangeYConfig(seriesForView.map(s=>s.values)));
@@ -403,59 +490,39 @@ function buildPointsChart(forceOverview){
   pointsChartLabels=labels;
   const finalMaxX=labels.length-1;
   const datasets=seriesForView.map(s=>({
-    label:s.label,
-    data:s.values.map((y,i)=>({x:i,y})),
-    borderColor:s.color,
-    backgroundColor:s.color+'22',
-    borderWidth:2.5,
-    pointRadius:4,
-    pointHoverRadius:6,
-    tension:0,
-    fill:false
+    label:s.label,data:s.values.map((y,i)=>({x:i,y})),
+    borderColor:s.color,backgroundColor:s.color+'22',borderWidth:2.5,
+    pointRadius:4,pointHoverRadius:6,tension:0,fill:false
   }));
   pointsChartInst=new Chart(document.getElementById('pointsChart'),{
-    type:'line',
-    data:{datasets},
+    type:'line',data:{datasets},
     options:{
-      responsive:true,maintainAspectRatio:false,
-      animation:false,
+      responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},
-        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' pts'}}
-      },
-      onClick:(e,elements,chart)=>{
-        const pts=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
-        if(pts.length){chart.tooltip.setActiveElements(pts,{x:e.x,y:e.y});chart.update();}
-      },
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' pts'}}},
       scales:{
         y:Object.assign({title:{display:true,text:'Total Poin'},grid:{color:'rgba(255,255,255,0.06)'}},yCfg),
-        x:{
-          type:'linear',min:0,max:finalMaxX,
+        x:{type:'linear',min:0,max:finalMaxX,
           ticks:{stepSize:1,color:'#8B7A8E',callback:v=>(Math.abs(v-Math.round(v))<0.01?(pointsChartLabels[Math.round(v)]??''):'')},
-          title:{display:true,text:'Gameweek'},grid:{display:false}
-        }
+          title:{display:true,text:'Gameweek'},grid:{display:false}}
       }
     },
     plugins:[pointsTipPlugin]
   });
   pointsChartInst.$progress=finalMaxX;
-
   const btnHybrid=document.getElementById('btnHybridPoints');
   if(btnHybrid){
-    const canFocus=pointsFullLabels.length>2;
-    btnHybrid.style.display=canFocus?'inline-flex':'none';
+    btnHybrid.style.display=pointsFullLabels.length>2?'inline-flex':'none';
     btnHybrid.textContent=pointsHybridFocused?'↩ Kembali ke Overview':('🔍 Fokus ke '+Math.min(HYBRID_FOCUS_N,pointsFullLabels.length-1)+' GW Terakhir');
   }
 }
-
 function render(gw){
   const data=LEAGUE_DATA[gw];if(!data)return;
   document.getElementById('standingsLabel').textContent='· '+data.label;
   document.getElementById('squadsLabel').textContent='· '+data.label;
   document.getElementById('insightsLabel').textContent='· '+data.label;
   document.querySelector('.last-update').textContent='Data per '+data.updated;
-
   const leaderTotal=data.standings[0].total;
   let stHtml=`<table><thead><tr><th>Rank</th><th>Pergerakan</th><th>Team</th><th>Manager</th><th>GW</th><th>Total</th><th>Gap</th><th>Overall</th></tr></thead><tbody>`;
   data.standings.forEach((r,i)=>{
@@ -466,17 +533,16 @@ function render(gw){
   });
   stHtml+=`</tbody></table>`;
   document.getElementById('standingsTable').innerHTML=stHtml;
-
   const pts=data.standings.map(s=>s.gw);
   const avg=(pts.reduce((a,b)=>a+b,0)/pts.length).toFixed(1);
+  const gAvg=gw===1?50:gw===2?81:gw===3?51:81;
   document.getElementById('standingsStats').innerHTML=`
     <div class="stat-box"><div class="value">${avg}</div><div class="label">Rata-rata GW</div></div>
     <div class="stat-box"><div class="value">${Math.max(...pts)}</div><div class="label">Tertinggi GW</div></div>
     <div class="stat-box"><div class="value">${Math.min(...pts)}</div><div class="label">Terendah GW</div></div>
     <div class="stat-box"><div class="value">${Math.max(...pts)-Math.min(...pts)}</div><div class="label">Rentang</div></div>
-    <div class="stat-box"><div class="value">~81</div><div class="label">Avg Global</div></div>
+    <div class="stat-box"><div class="value">~${gAvg}</div><div class="label">Avg Global</div></div>
     <div class="stat-box"><div class="value">${data.standings.length}</div><div class="label">Tim</div></div>`;
-
   if(animRafId){cancelAnimationFrame(animRafId);animRafId=null;animPlaying=false;
     const bAnim=document.getElementById('btnAnimPoints');
     const bPdf=document.getElementById('btnPdfPoints');
@@ -491,10 +557,7 @@ function render(gw){
     allGWs.forEach(g=>{const row=LEAGUE_DATA[g].standings.find(s=>s.team===team);if(row)running=row.total;points.push(running)});
     return{label:team,color:colors[idx%colors.length],values:points};
   });
-  pointsFullSeries=seriesData;
-  pointsFullLabels=labels;
-  buildPointsChart();
-
+  pointsFullSeries=seriesData;pointsFullLabels=labels;buildPointsChart();
   const benchTotals=getAccumBench();
   const benchTeams=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
   const benchColors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];
@@ -504,7 +567,6 @@ function render(gw){
     data:{labels:benchTeams,datasets:[{label:'Bench points',data:benchTeams.map(t=>benchTotals[t]||0),backgroundColor:benchTeams.map((_,i)=>benchColors[i%benchColors.length]),borderRadius:6,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' pts di bangku'}}},scales:{y:{beginAtZero:true,title:{display:true,text:'Poin Bench'},grid:{color:'rgba(255,255,255,0.06)'}},x:{grid:{display:false}}}}
   });
-
   const mgrSelect=document.getElementById('managerClubSelect');
   const prevMgr=mgrSelect.value;mgrSelect.innerHTML='';
   getManagerList().forEach(m=>{const opt=document.createElement('option');opt.value=m.manager;opt.textContent=m.manager+' ('+m.team+')';mgrSelect.appendChild(opt)});
@@ -513,23 +575,25 @@ function render(gw){
   mgrSelect.onchange=()=>renderClubChart(mgrSelect.value);
   if(mgrSelect.value)renderClubChart(mgrSelect.value);
 
+  const luSelect=document.getElementById('managerLineupSelect');
+  if(luSelect){
+    const prevLu=luSelect.value;luSelect.innerHTML='';
+    getManagerList().forEach(m=>{const opt=document.createElement('option');opt.value=m.manager;opt.textContent=m.manager+' ('+m.team+')';luSelect.appendChild(opt)});
+    if(prevLu&&[...luSelect.options].some(o=>o.value===prevLu))luSelect.value=prevLu;
+    else if(luSelect.options.length)luSelect.selectedIndex=0;
+    luSelect.onchange=()=>renderLineupSeason(luSelect.value);
+    if(luSelect.value)renderLineupSeason(luSelect.value);
+  }
   let sqHtml='';
   data.squads.forEach(s=>{
     const ptsBadge=s.pts>=110?'badge-green':s.pts>=90?'badge-blue':s.pts>=70?'badge-yellow':'badge-red';
-    sqHtml+=`<div class="squad-detail">
-      <h4>${s.rank}. ${s.team} — ${s.manager} <span class="badge ${ptsBadge}">${s.pts} pts</span></h4>
-      <div class="meta">Formasi <span class="badge badge-green">${s.form}</span>
-        ${s.chip?`· Chip <span class="badge badge-blue">${s.chip}</span>`:''}
-        · Captain ${s.capt}</div>
-      <p><span class="pos-label">GK</span> ${s.gk}</p>
-      <p><span class="pos-label">DEF</span> ${s.def}</p>
-      <p><span class="pos-label">MID</span> ${s.mid}</p>
-      <p><span class="pos-label">FWD</span> ${s.fwd}</p>
-      <p style="margin-top:0.45rem;font-size:0.78rem;color:var(--muted)"><strong>Catatan:</strong> ${s.clubs}</p>
-    </div>`;
+    sqHtml+=`<div class="squad-detail"><h4>${s.rank}. ${s.team} — ${s.manager} <span class="badge ${ptsBadge}">${s.pts} pts</span></h4>
+      <div class="meta">Formasi <span class="badge badge-green">${s.form}</span>${s.chip?` · Chip <span class="badge badge-blue">${s.chip}</span>`:''} · Captain ${s.capt}</div>
+      <p><span class="pos-label">GK</span> ${s.gk}</p><p><span class="pos-label">DEF</span> ${s.def}</p>
+      <p><span class="pos-label">MID</span> ${s.mid}</p><p><span class="pos-label">FWD</span> ${s.fwd}</p>
+      <p style="margin-top:0.45rem;font-size:0.78rem;color:var(--muted)"><strong>Catatan:</strong> ${s.clubs}</p></div>`;
   });
   document.getElementById('squadsContent').innerHTML=sqHtml;
-
   const formCount={};data.squads.forEach(s=>{formCount[s.form]=(formCount[s.form]||0)+1});
   let formHtml=`<div class="two-col"><div class="card"><h2>Distribusi Formasi</h2><table><thead><tr><th>Formasi</th><th>Jumlah</th></tr></thead><tbody>`;
   Object.entries(formCount).sort((a,b)=>b[1]-a[1]).forEach(([f,c])=>{formHtml+=`<tr class="${c>=3?'rank-1':''}"><td>${f}</td><td>${c}</td></tr>`});
@@ -538,7 +602,6 @@ function render(gw){
   Object.entries(captCount).sort((a,b)=>b[1]-a[1]).forEach(([c,n])=>{formHtml+=`<tr class="${n>=3?'rank-1':''}"><td>${c}</td><td>${n}</td></tr>`});
   formHtml+=`</tbody></table></div></div>`;
   document.getElementById('formationsContent').innerHTML=formHtml;
-
   let wHtml=`<table><thead><tr><th>Gameweek</th><th>Peringkat Pertama (Poin GW)</th><th>Peringkat Terakhir (Poin GW)</th></tr></thead><tbody>`;
   buildWeeklyHistory().forEach(h=>{
     wHtml+=`<tr><td><strong>GW${h.gw}</strong></td>
@@ -547,7 +610,6 @@ function render(gw){
   });
   wHtml+=`</tbody></table>`;
   document.getElementById('weeklyTable').innerHTML=wHtml;
-
   let aHtml=`<table><thead><tr><th>Manager</th><th>Team</th><th>Kali Rank 1</th><th>Kali Rank Terakhir</th><th>Selisih</th></tr></thead><tbody>`;
   buildAccum().forEach(m=>{
     const diff=m.first-m.last;
@@ -559,7 +621,6 @@ function render(gw){
   });
   aHtml+=`</tbody></table>`;
   document.getElementById('weeklyAccum').innerHTML=aHtml;
-
   let cHtml=`<table><thead><tr><th>GW</th><th>Manager</th><th>Team</th><th>Chip</th><th>Keterangan</th></tr></thead><tbody>`;
   getAllGWs().forEach(g=>{
     LEAGUE_DATA[g].chips.forEach(c=>{
@@ -570,7 +631,6 @@ function render(gw){
   });
   cHtml+=`</tbody></table>`;
   document.getElementById('chipsContent').innerHTML=cHtml;
-
   let hHtml=`<table><thead><tr><th>Gameweek</th><th>Manager yang Kena Hit</th><th>Total Potongan</th></tr></thead><tbody>`;
   getAllGWs().forEach(g=>{
     const d=LEAGUE_DATA[g];const totalHit=d.hits.reduce((s,h)=>s+(h.cost||0),0);
@@ -578,9 +638,8 @@ function render(gw){
       <td>${d.hits.length?d.hits.map(h=>`${h.team} (−${h.cost})`).join(', '):'<span style="color:var(--muted);font-style:italic">Tidak ada (semua free transfer)</span>'}</td>
       <td style="font-weight:700;color:${totalHit>0?'var(--fpl-pink)':'var(--fpl-green)'}">${totalHit}</td></tr>`;
   });
-  hHtml+=`</tbody></table><p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem">GW2: King Polenk, SCOUSER, Betelguese masing-masing 1 free transfer. Tidak ada hit (−4).</p>`;
+  hHtml+=`</tbody></table><p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem">GW3: Betelguese −8. Lainnya free / chip.</p>`;
   document.getElementById('hitsContent').innerHTML=hHtml;
-
   const hitByManager={};
   getAllGWs().forEach(g=>{LEAGUE_DATA[g].hits.forEach(h=>{hitByManager[h.team]=(hitByManager[h.team]||0)+h.cost})});
   const latestTeams=data.standings.map(s=>s.team);
@@ -588,33 +647,27 @@ function render(gw){
   hitsChartInst=new Chart(document.getElementById('hitsChart'),{
     type:'bar',
     data:{labels:latestTeams,datasets:[{data:latestTeams.map(t=>hitByManager[t]||0),backgroundColor:'#E90052',borderRadius:6}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Akumulasi Transfer Hits',font:{family:'Plus Jakarta Sans',size:14},color:'#C4B5C8'}},scales:{y:{beginAtZero:true,max:8},x:{grid:{display:false}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Akumulasi Transfer Hits',font:{family:'Plus Jakarta Sans',size:14},color:'#C4B5C8'}},scales:{y:{beginAtZero:true,max:12},x:{grid:{display:false}}}}
   });
-
-  const isGW2=gw===2;
-  document.getElementById('insightsContent').innerHTML=isGW2?`
-    <div class="insight-box"><h4>1. Comeback of the Week — Giri - giri</h4>
-      <p><strong>Muhammad Fariz Azhari</strong> lompat rank 6 → <strong>rank 2</strong> dengan <strong>124 poin</strong>. Captain B.Fernandes jadi kunci. Selisih ke juara hanya 1 poin.</p></div>
-    <div class="insight-box"><h4>2. King Polenk tetap puncak</h4>
-      <p>Andre Nosega Purnama bertahan rank 1 (164 pts) — konsisten 2 minggu di puncak.</p></div>
-    <div class="insight-box"><h4>3. Captain meta: B.Fernandes</h4>
-      <p>Bruno Fernandes top element GW2 (23 pts / 46 as C). Mayoritas yang captain Bruno finis 4 besar.</p></div>
-    <div class="insight-box"><h4>4. Betelguese jatuh ke dasar</h4>
-      <p>Vikri Nur Rohim rank terakhir GW2 (84 pts) dengan 25 poin di bangku.</p></div>
-    <div class="insight-box"><h4>5. Anggota baru</h4>
-      <p><strong>Milenials</strong> (Indra Aprilian) bergabung — hanya poin GW2 (95). Bruno C 46 pts.</p></div>
-    <div class="insight-box"><h4>6. Rata-rata liga vs global</h4>
-      <p>Rata-rata liga GW2 ≈ <strong>${avg}</strong> vs global ~81.</p></div>`:`
-    <div class="insight-box"><h4>1. Kejutan GW1 — King Polenk Juara</h4>
-      <p><strong>King Polenk</strong> puncak dengan 66 poin lewat differential + captain João Pedro.</p></div>
-    <div class="insight-box"><h4>2. Bench Boost SCOUSER</h4>
-      <p>SCOUSER memakai Bench Boost, finis rank 2 (58 pts).</p></div>
-    <div class="insight-box"><h4>3. Formasi & Captain</h4>
-      <p>3-4-3 paling populer. Haaland captain favorit, juara mingguan captain João Pedro.</p></div>
-    <div class="insight-box"><h4>4. Catatan</h4>
-      <p>Gunakan filter Gameweek untuk detail per minggu.</p></div>`;
+  const isGW3=gw===3,isGW2=gw===2;
+  document.getElementById('insightsContent').innerHTML=isGW3?`
+    <div class="insight-box"><h4>1. GW3 FINAL</h4><p>Sudah <code>data_checked: true</code>. Avg global ~51.</p></div>
+    <div class="insight-box"><h4>2. sinar muda fc puncak (Free Hit)</h4><p>Andri Varane · 221 pts · rank 1.</p></div>
+    <div class="insight-box"><h4>3. MotW — SCOUSER 68</h4><p>Zava Anbiya · Isak C · naik 5→2.</p></div>
+    <div class="insight-box"><h4>4. TC Haaland — Parpas & Giri</h4><p>Parpas 64 · Giri 50 (26 bench). King Polenk 35 tanpa Haaland (2 autosub).</p></div>
+    <div class="insight-box"><h4>5. Betelguese −8</h4><p>Wissa + Cherki + Sangaré · 54 pts setelah hit.</p></div>
+    <div class="insight-box"><h4>6. Rata-rata liga</h4><p>≈ <strong>${avg}</strong> vs global ~51.</p></div>`:isGW2?`
+    <div class="insight-box"><h4>1. Comeback — Giri - giri</h4><p>Rank 6→2 dengan 124 pts. Bruno C.</p></div>
+    <div class="insight-box"><h4>2. King Polenk puncak</h4><p>Bertahan rank 1 (164 pts).</p></div>
+    <div class="insight-box"><h4>3. Captain meta Bruno</h4><p>Mayoritas 4 besar captain Bruno.</p></div>
+    <div class="insight-box"><h4>4. Betelguese terakhir GW</h4><p>84 pts · 25 di bangku.</p></div>
+    <div class="insight-box"><h4>5. Milenials join</h4><p>Hanya poin GW2 (95).</p></div>
+    <div class="insight-box"><h4>6. Rata-rata</h4><p>≈ <strong>${avg}</strong> vs global ~81.</p></div>`:`
+    <div class="insight-box"><h4>1. King Polenk juara GW1</h4><p>66 pts · captain João Pedro.</p></div>
+    <div class="insight-box"><h4>2. Bench Boost SCOUSER</h4><p>Rank 2 (58 pts).</p></div>
+    <div class="insight-box"><h4>3. Formasi & Captain</h4><p>3-4-3 populer. Haaland captain favorit.</p></div>
+    <div class="insight-box"><h4>4. Catatan</h4><p>Filter Gameweek untuk detail per minggu.</p></div>`;
 }
-
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -623,7 +676,6 @@ document.querySelectorAll('.tab').forEach(tab=>{
     document.getElementById(tab.dataset.tab).classList.add('active');
   });
 });
-
 const select=document.getElementById('gwSelect');
 select.innerHTML='';
 getAllGWs().reverse().forEach(gw=>{
@@ -632,122 +684,51 @@ getAllGWs().reverse().forEach(gw=>{
   select.appendChild(opt);
 });
 select.addEventListener('change',()=>render(parseInt(select.value)));
-
 function downloadPointsChartPDF(){
   if(!pointsChartInst){alert('Chart belum siap');return}
-
-  // Pastikan chart dalam kondisi penuh (bukan lagi mid-animasi) sebelum di-capture
   if(animRafId){cancelAnimationFrame(animRafId);animRafId=null;animPlaying=false;
     const bAnim=document.getElementById('btnAnimPoints');
     const bPdf=document.getElementById('btnPdfPoints');
     if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}
     if(bPdf){bPdf.disabled=false;bPdf.style.opacity='1';bPdf.style.cursor='pointer';}}
-
-  // PDF selalu tampilkan overview musim penuh, apa pun tampilan yang lagi aktif di layar
   const wasFocused=pointsHybridFocused;
-  if(wasFocused){ buildPointsChart(true); }
+  if(wasFocused) buildPointsChart(true);
   const finalMaxX=pointsChartLabels.length-1;
   pointsChartInst.options.scales.x.max=finalMaxX;
   pointsChartInst.$progress=finalMaxX;
   pointsChartInst.update('none');
-
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
-  const pageW = 297, pageH = 210;
-  const margin = 14;
-  const contentW = pageW - margin*2;
-
-  // Snapshot current chart options to restore after export
-  const chart = pointsChartInst;
-  const saved = {
-    bg: chart.options.backgroundColor,
-    legendColor: chart.options.plugins?.legend?.labels?.color,
-    titleColor: chart.options.plugins?.title?.color,
-    xGrid: chart.options.scales?.x?.grid?.color,
-    yGrid: chart.options.scales?.y?.grid?.color,
-    xTick: chart.options.scales?.x?.ticks?.color,
-    yTick: chart.options.scales?.y?.ticks?.color,
-    xTitle: chart.options.scales?.x?.title?.color,
-    yTitle: chart.options.scales?.y?.title?.color,
-  };
-
-  // Force light theme + high DPI for sharp PDF
-  const SCALE = 4;
-  const canvas = chart.canvas;
-  const cssW = canvas.offsetWidth;
-  const cssH = canvas.offsetHeight;
-  const prevRatio = chart.options.devicePixelRatio || window.devicePixelRatio || 1;
-
-  chart.options.backgroundColor = '#FFFFFF';
-  chart.options.devicePixelRatio = SCALE;
-  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = '#0F172A';
-  if(chart.options.scales?.x){
-    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = 'rgba(15,23,42,0.08)';
-    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = '#475569';
-    if(chart.options.scales.x.title) chart.options.scales.x.title.color = '#334155';
-  }
-  if(chart.options.scales?.y){
-    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = 'rgba(15,23,42,0.08)';
-    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = '#475569';
-    if(chart.options.scales.y.title) chart.options.scales.y.title.color = '#334155';
-  }
-  chart.resize(cssW, cssH);
-  chart.update('none');
-
-  const img = chart.toBase64Image('image/png', 1.0);
-
-  // Restore dark theme + original DPI
-  chart.options.backgroundColor = saved.bg;
-  chart.options.devicePixelRatio = prevRatio;
-  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = saved.legendColor;
-  if(chart.options.scales?.x){
-    if(chart.options.scales.x.grid) chart.options.scales.x.grid.color = saved.xGrid;
-    if(chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = saved.xTick;
-    if(chart.options.scales.x.title) chart.options.scales.x.title.color = saved.xTitle;
-  }
-  if(chart.options.scales?.y){
-    if(chart.options.scales.y.grid) chart.options.scales.y.grid.color = saved.yGrid;
-    if(chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = saved.yTick;
-    if(chart.options.scales.y.title) chart.options.scales.y.title.color = saved.yTitle;
-  }
-  chart.resize();
-  chart.update('none');
-
-  // White page
-  pdf.setFillColor(255, 255, 255);
-  pdf.rect(0, 0, pageW, pageH, 'F');
-
-  pdf.setTextColor(15, 23, 42);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(14);
-  pdf.text('QA Nippon Paint — Akumulasi Poin Sepanjang Musim', margin, 14);
-
-  pdf.setTextColor(100, 116, 139);
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(9);
-  const gwLabel = document.getElementById('gwSelect')?.selectedOptions?.[0]?.text || '';
-  pdf.text('Fantasy Premier League · League 1331564 · ' + gwLabel, margin, 20);
-
-  pdf.setDrawColor(226, 232, 240);
-  pdf.setLineWidth(0.3);
-  pdf.line(margin, 24, pageW - margin, 24);
-
-  const chartTop = 28;
-  const chartH = pageH - chartTop - margin - 6;
-  pdf.addImage(img, 'PNG', margin, chartTop, contentW, chartH);
-
-  pdf.setFontSize(8);
-  pdf.setTextColor(148, 163, 184);
-  pdf.text('QA Nippon Paint League Analysis', margin, pageH - 6);
-  pdf.text(new Date().toISOString().slice(0,10), pageW - margin - 22, pageH - 6);
-
+  const pageW=297,pageH=210,margin=14,contentW=pageW-margin*2;
+  const chart=pointsChartInst;
+  const SCALE=4;
+  const cssW=chart.canvas.offsetWidth,cssH=chart.canvas.offsetHeight;
+  const prevRatio=chart.options.devicePixelRatio||window.devicePixelRatio||1;
+  chart.options.backgroundColor='#FFFFFF';
+  chart.options.devicePixelRatio=SCALE;
+  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color='#0F172A';
+  if(chart.options.scales?.x){if(chart.options.scales.x.grid)chart.options.scales.x.grid.color='rgba(15,23,42,0.08)';if(chart.options.scales.x.ticks)chart.options.scales.x.ticks.color='#475569';if(chart.options.scales.x.title)chart.options.scales.x.title.color='#334155';}
+  if(chart.options.scales?.y){if(chart.options.scales.y.grid)chart.options.scales.y.grid.color='rgba(15,23,42,0.08)';if(chart.options.scales.y.ticks)chart.options.scales.y.ticks.color='#475569';if(chart.options.scales.y.title)chart.options.scales.y.title.color='#334155';}
+  chart.resize(cssW,cssH);chart.update('none');
+  const img=chart.toBase64Image('image/png',1.0);
+  chart.options.backgroundColor=undefined;
+  chart.options.devicePixelRatio=prevRatio;
+  if(chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color='#C4B5C8';
+  chart.resize();chart.update('none');
+  pdf.setFillColor(255,255,255);pdf.rect(0,0,pageW,pageH,'F');
+  pdf.setTextColor(15,23,42);pdf.setFont('helvetica','bold');pdf.setFontSize(14);
+  pdf.text('QA Nippon Paint — Akumulasi Poin Sepanjang Musim',margin,14);
+  pdf.setTextColor(100,116,139);pdf.setFont('helvetica','normal');pdf.setFontSize(9);
+  pdf.text('Fantasy Premier League · League 1331564 · '+(document.getElementById('gwSelect')?.selectedOptions?.[0]?.text||''),margin,20);
+  pdf.setDrawColor(226,232,240);pdf.setLineWidth(0.3);pdf.line(margin,24,pageW-margin,24);
+  const chartTop=28,chartH=pageH-chartTop-margin-6;
+  pdf.addImage(img,'PNG',margin,chartTop,contentW,chartH);
+  pdf.setFontSize(8);pdf.setTextColor(148,163,184);
+  pdf.text('QA Nippon Paint League Analysis',margin,pageH-6);
+  pdf.text(new Date().toISOString().slice(0,10),pageW-margin-22,pageH-6);
   pdf.save('QA-Nippon-Paint-Akumulasi-Poin.pdf');
-
-  // Balikin tampilan layar ke mode fokus lagi kalau sebelumnya memang lagi fokus
-  if(wasFocused){ buildPointsChart(); }
+  if(wasFocused) buildPointsChart();
 }
-
-
 function playPointsChartAnimation(){
   if(!pointsChartInst||animPlaying)return;
   const chart=pointsChartInst;
@@ -757,23 +738,15 @@ function playPointsChartAnimation(){
   animPlaying=true;
   if(btn){btn.disabled=true;btn.textContent='▶ Memutar...';btn.style.opacity='0.6';}
   if(pdfBtn){pdfBtn.disabled=true;pdfBtn.style.opacity='0.5';pdfBtn.style.cursor='not-allowed';}
-
   const DURATION=4500;
-  chart.options.scales.x.max=0.001;
-  chart.$progress=0;
-  chart.update('none');
-
+  chart.options.scales.x.max=0.001;chart.$progress=0;chart.update('none');
   const t0=performance.now();
   function tick(now){
     const t=Math.min((now-t0)/DURATION,1);
-    const eased=easeInOutQuad(t);
-    const progress=eased*finalMaxX;
-    chart.$progress=progress;
-    chart.options.scales.x.max=Math.max(progress,0.001);
-    chart.update('none');
-    if(t<1){
-      animRafId=requestAnimationFrame(tick);
-    }else{
+    const progress=easeInOutQuad(t)*finalMaxX;
+    chart.$progress=progress;chart.options.scales.x.max=Math.max(progress,0.001);chart.update('none');
+    if(t<1) animRafId=requestAnimationFrame(tick);
+    else{
       animPlaying=false;animRafId=null;
       if(btn){btn.disabled=false;btn.textContent='▶ Putar Animasi';btn.style.opacity='1';}
       if(pdfBtn){pdfBtn.disabled=false;pdfBtn.style.opacity='1';pdfBtn.style.cursor='pointer';}
@@ -781,20 +754,57 @@ function playPointsChartAnimation(){
   }
   animRafId=requestAnimationFrame(tick);
 }
-
-document.getElementById('btnAnimPoints')?.addEventListener('click', playPointsChartAnimation);
-
-document.getElementById('btnHybridPoints')?.addEventListener('click', () => {
+document.getElementById('btnAnimPoints')?.addEventListener('click',playPointsChartAnimation);
+document.getElementById('btnHybridPoints')?.addEventListener('click',()=>{
   if(animRafId){cancelAnimationFrame(animRafId);animRafId=null;animPlaying=false;
     const bAnim=document.getElementById('btnAnimPoints');
     if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}}
-  pointsHybridFocused = !pointsHybridFocused;
-  buildPointsChart();
+  pointsHybridFocused=!pointsHybridFocused;buildPointsChart();
 });
+document.getElementById('btnPdfPoints')?.addEventListener('click',downloadPointsChartPDF);
+
+function jsonTreeHtml(val, key){
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(val===null) return (key!=null?`<span class="jt-key">${esc(key)}</span>: `:'')+`<span class="jt-null">null</span>`;
+  const t=typeof val;
+  if(t==='string') return (key!=null?`<span class="jt-key">${esc(key)}</span>: `:'')+`<span class="jt-str">"${esc(val)}"</span>`;
+  if(t==='number') return (key!=null?`<span class="jt-key">${esc(key)}</span>: `:'')+`<span class="jt-num">${val}</span>`;
+  if(t==='boolean') return (key!=null?`<span class="jt-key">${esc(key)}</span>: `:'')+`<span class="jt-bool">${val}</span>`;
+  if(Array.isArray(val)){
+    if(!val.length) return (key!=null?`<span class="jt-key">${esc(key)}</span>: `:'')+`[]`;
+    let inner=val.map((v,i)=>`<div>${jsonTreeHtml(v, String(i))}</div>`).join('');
+    const label=key!=null?`<span class="jt-key">${esc(key)}</span>: <span class="jt-inline">Array(${val.length})</span>`:`<span class="jt-inline">Array(${val.length})</span>`;
+    return `<details ${key==null||key==='by_gameweek'||key==='players'?'open':''}><summary>${label}</summary>${inner}</details>`;
+  }
+  if(t==='object'){
+    const keys=Object.keys(val);
+    if(!keys.length) return (key!=null?`<span class="jt-key">${esc(key)}</span>: `:'')+`{}`;
+    let inner=keys.map(k=>`<div>${jsonTreeHtml(val[k], k)}</div>`).join('');
+    const label=key!=null?`<span class="jt-key">${esc(key)}</span>: <span class="jt-inline">Object</span>`:`<span class="jt-inline">Object</span>`;
+    const open=key==null||key==='season_summary'||key==='by_gameweek'?' open':'';
+    return `<details${open}><summary>${label}</summary>${inner}</details>`;
+  }
+  return esc(String(val));
+}
+function renderLineupSeason(managerName){
+  const el=document.getElementById('lineupTree');
+  if(!el||typeof LINEUP_SEASON==='undefined')return;
+  const data=LINEUP_SEASON[managerName];
+  if(!data){el.innerHTML='<span style="color:var(--muted)">Belum ada data.</span>';return}
+  el.innerHTML=jsonTreeHtml(data, null);
+}
 
 
-document.getElementById('btnPdfPoints')?.addEventListener('click', downloadPointsChartPDF);
-
+document.getElementById('btnCopyLineup')?.addEventListener('click',()=>{
+  const sel=document.getElementById('managerLineupSelect');
+  if(!sel||typeof LINEUP_SEASON==='undefined')return;
+  const data=LINEUP_SEASON[sel.value];
+  if(!data)return;
+  navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>{
+    const b=document.getElementById('btnCopyLineup');
+    if(b){const t=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=t,1200)}
+  });
+});
 
 render(Math.max(...getAllGWs()));
 </script>
