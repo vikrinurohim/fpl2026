@@ -202,6 +202,17 @@ dialog.club-modal-overlay{border:0;background:transparent;color:var(--text);widt
 </div>
 <p style="font-size:0.8rem;color:var(--muted);margin:0 0 1rem">Total poin kumulatif tiap manajer per gameweek</p>
 <div class="chart-container" style="height:320px"><canvas id="pointsChart"></canvas></div>
+</div><div class="card">
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem">
+<h2 style="margin:0;padding:0;border:none">Poin per Gameweek</h2>
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+<button type="button" id="btnHybridWeeklyPoints" style="background:transparent;color:var(--fpl-cyan);border:1.5px solid var(--fpl-cyan);border-radius:999px;padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap;display:none">🔍 Fokus ke 5 GW Terakhir</button>
+<button type="button" id="btnAnimWeeklyPoints" style="background:transparent;color:var(--fpl-green);border:1.5px solid var(--fpl-green);border-radius:999px;padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;white-space:nowrap">▶ Putar Animasi</button>
+<button type="button" id="btnPdfWeeklyPoints" style="background:linear-gradient(135deg,#00FF87,#00D9A0);color:#0A0A0A;border:none;border-radius:999px;padding:0.5rem 1.1rem;font-weight:700;font-size:0.8rem;font-family:inherit;cursor:pointer;box-shadow:0 2px 12px rgba(0,255,135,0.3);white-space:nowrap">Download PDF (A4)</button>
+</div>
+</div>
+<p style="font-size:0.8rem;color:var(--muted);margin:0 0 1rem">Poin GW sesuai klasemen, bukan akumulasi. Seluruh GW tersedia; tim yang belum tercatat tidak dianggap 0.</p>
+<div class="chart-container" style="height:320px"><canvas id="weeklyPointsChart"></canvas></div>
 </div>
 </div>
 <div id="manager" class="panel" role="tabpanel" aria-labelledby="tab-manager" tabindex="0" hidden="hidden"><p class="tab-scope">Line-up mengikuti pilihan manager dan GW di bawah. Grafik bench menampilkan seluruh musim; ringkasan skuad dan formasi mengikuti filter GW di atas.</p><div class="card">
@@ -213,6 +224,7 @@ dialog.club-modal-overlay{border:0;background:transparent;color:var(--text);widt
 </div>
 <div class="lineup-pdf-actions"><button type="button" id="btnPdfLineup">Download PDF Line-up</button><span id="lineupPdfStatus" role="status"></span></div>
 <div id="lineupTable" aria-live="polite"></div>
+<section id="managerDecisions" style="margin-top:1.5rem"></section>
 <details class="lineup-raw"><summary>Data mentah (JSON)</summary>
 <p class="lineup-description">Data lengkap sepanjang musim untuk manager yang dipilih.</p>
 <button type="button" id="btnCopyLineup">Copy JSON</button>
@@ -226,7 +238,7 @@ dialog.club-modal-overlay{border:0;background:transparent;color:var(--text);widt
 <div class="chart-container" style="height:280px"><canvas id="benchChart"></canvas></div>
 <p style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;font-style:italic">* Semakin tinggi = semakin banyak poin “terbuang” di bench</p>
 </div>
-<div class="card"><h2>Ringkasan Skuad Liga <span id="squadsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2><div id="squadsContent"></div></div><div id="formationsContent"></div></div><div id="clubs" class="panel" role="tabpanel" aria-labelledby="tab-clubs" tabindex="0" hidden="hidden"><p class="tab-scope">Akumulasi klub sepanjang musim. Klik total pemilihan untuk melihat pemain per gameweek.</p><div class="card">
+<div class="card"><h2>Peta Pilihan Liga <span id="squadsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2><div id="squadsContent"></div></div><div id="formationsContent"></div></div><div id="clubs" class="panel" role="tabpanel" aria-labelledby="tab-clubs" tabindex="0" hidden="hidden"><p class="tab-scope">Akumulasi klub sepanjang musim. Klik total pemilihan untuk melihat pemain per gameweek.</p><div class="card">
 <h2>Klub Favorit per Manager</h2>
 <p style="font-size:0.8rem;color:var(--muted);margin:-0.4rem 0 1rem">Akumulasi pemain per klub di Starting XI (seluruh musim)</p>
 <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
@@ -240,6 +252,7 @@ dialog.club-modal-overlay{border:0;background:transparent;color:var(--text);widt
 
 </div><div id="weekly" class="panel" role="tabpanel" aria-labelledby="tab-weekly" tabindex="0" hidden="hidden">
 <p class="tab-scope">Sorotan mengikuti filter GW di atas. Riwayat peringkat mencakup seluruh gameweek yang tersedia.</p><div class="card"><h2>Sorotan Gameweek <span id="insightsLabel" style="font-weight:500;font-size:0.85rem;color:var(--muted)"></span></h2><div id="insightsContent"></div></div><div class="card"><h2>Peringkat Pertama &amp; Terakhir per Gameweek</h2><div id="weeklyTable"></div></div>
+<div class="card"><h2>Pemain Pembeda</h2><div id="differentialPlayers"></div></div>
 <div class="card"><h2>Akumulasi Sepanjang Musim</h2><div id="weeklyAccum"></div></div>
 </div>
 <div id="chips" class="panel" role="tabpanel" aria-labelledby="tab-chips" tabindex="0" hidden="hidden"><p class="tab-scope">Riwayat penggunaan chips dan potongan transfer sepanjang musim.</p><div class="card"><h2>Penggunaan Chips</h2><div id="chipsContent"></div></div><div class="card"><h2>Transfer Hits</h2><div id="hitsContent"></div><div class="chart-container" style="margin-top:1.15rem"><canvas id="hitsChart"></canvas></div></div></div>
@@ -254,6 +267,9 @@ dialog.club-modal-overlay{border:0;background:transparent;color:var(--text);widt
   </div>
 </dialog>
 
+<dialog id="hitDetailModal" aria-labelledby="hitDetailTitle" style="margin:auto;width:min(560px,94vw);max-height:85vh;overflow:auto;border:1px solid var(--border);border-radius:16px;padding:0;background:var(--bg-card);color:var(--text)" onclick="if(event.target===this&&event.clientX<this.getBoundingClientRect().left)this.close()">
+ <div style="padding:1.25rem"><button type="button" onclick="document.getElementById('hitDetailModal').close()" style="float:right;padding:.5rem .8rem;cursor:pointer;border-radius:8px">Tutup</button><h3 id="hitDetailTitle">Detail Transfer Hit</h3><p id="hitDetailSummary" style="color:var(--muted);margin:.6rem 0 1rem"></p><div id="hitDetailBody"></div></div>
+</dialog>
 <div class="footer"><span>QA Nippon Paint</span> · FPL Classic League Analysis · League ID 1331564<br>Inspired by Fantasy Premier League · Data from Official FPL API</div>
 <script>
 
@@ -591,6 +607,7 @@ function gwUpdateTimeWIB(updated){
 }
 
 function render(gw){
+  renderDifferentials(Number(gw));
   const data=LEAGUE_DATA[gw];if(!data)return;
   document.getElementById('standingsLabel').textContent='· '+data.label;
   document.getElementById('squadsLabel').textContent='· '+data.label;
@@ -630,7 +647,7 @@ function render(gw){
     allGWs.forEach(g=>{const row=LEAGUE_DATA[g].standings.find(s=>s.team===team);if(row)running=row.total;points.push(running)});
     return{label:team,color:colors[idx%colors.length],values:points};
   });
-  pointsFullSeries=seriesData;pointsFullLabels=labels;buildPointsChart();
+  pointsFullSeries=seriesData;pointsFullLabels=labels;buildPointsChart();renderWeeklyPerformance();
   const benchTotals=getAccumBench();
   const benchTeams=LEAGUE_DATA[Math.max(...allGWs)].standings.map(s=>s.team);
   const benchColors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];
@@ -657,23 +674,11 @@ function render(gw){
     luSelect.onchange=()=>renderLineupSeason(luSelect.value);
     if(luSelect.value)renderLineupSeason(luSelect.value);
   }
-  let sqHtml='';
-  data.squads.forEach(s=>{
-    const ptsBadge=s.pts>=110?'badge-green':s.pts>=90?'badge-blue':s.pts>=70?'badge-yellow':'badge-red';
-    sqHtml+=`<div class="squad-detail"><h4>${s.rank}. ${s.team} — ${s.manager} <span class="badge ${ptsBadge}">${s.pts} pts</span></h4>
-      <div class="meta">Formasi <span class="badge badge-green">${s.form}</span>${s.chip?` · Chip <span class="badge badge-blue">${s.chip}</span>`:''} · Captain ${s.capt}</div>
-      <p><span class="pos-label">GK</span> ${s.gk}</p><p><span class="pos-label">DEF</span> ${s.def}</p>
-      <p><span class="pos-label">MID</span> ${s.mid}</p><p><span class="pos-label">FWD</span> ${s.fwd}</p>
-      <p style="margin-top:0.45rem;font-size:0.78rem;color:var(--muted)"><strong>Catatan:</strong> ${s.clubs}</p></div>`;
-  });
-  document.getElementById('squadsContent').innerHTML=sqHtml;
+  renderLeagueChoices(Number(gw));
   const formCount={};data.squads.forEach(s=>{formCount[s.form]=(formCount[s.form]||0)+1});
-  let formHtml=`<div class="two-col"><div class="card"><h2>Distribusi Formasi</h2><table><thead><tr><th>Formasi</th><th>Jumlah</th></tr></thead><tbody>`;
+  let formHtml=`<div class="card"><h2>Distribusi Formasi</h2><table><thead><tr><th>Formasi</th><th>Jumlah Manager</th></tr></thead><tbody>`;
   Object.entries(formCount).sort((a,b)=>b[1]-a[1]).forEach(([f,c])=>{formHtml+=`<tr class="${c>=3?'rank-1':''}"><td>${f}</td><td>${c}</td></tr>`});
-  formHtml+=`</tbody></table></div><div class="card"><h2>Captain Choices</h2><table><thead><tr><th>Captain</th><th>Jumlah</th></tr></thead><tbody>`;
-  const captCount={};data.squads.forEach(s=>{captCount[s.capt]=(captCount[s.capt]||0)+1});
-  Object.entries(captCount).sort((a,b)=>b[1]-a[1]).forEach(([c,n])=>{formHtml+=`<tr class="${n>=3?'rank-1':''}"><td>${c}</td><td>${n}</td></tr>`});
-  formHtml+=`</tbody></table></div></div>`;
+  formHtml+=`</tbody></table></div>`;
   document.getElementById('formationsContent').innerHTML=formHtml;
   let wHtml=`<table><thead><tr><th>Gameweek</th><th>Peringkat Pertama (Poin GW)</th><th>Peringkat Terakhir (Poin GW)</th></tr></thead><tbody>`;
   buildWeeklyHistory().forEach(h=>{
@@ -705,9 +710,9 @@ function render(gw){
     const d=LEAGUE_DATA[g];const totalHit=d.hits.reduce((s,h)=>s+(h.cost||0),0);
     hHtml+=`<tr><td><strong>GW${g}</strong></td>
       <td>${d.hits.length?d.hits.map(h=>`${h.team} (−${h.cost})`).join(', '):'<span style="color:var(--muted);font-style:italic">Tidak ada (semua free transfer)</span>'}</td>
-      <td style="font-weight:700;color:${totalHit>0?'var(--fpl-pink)':'var(--fpl-green)'}">${totalHit}</td></tr>`;
+      <td style="font-weight:700;color:${totalHit>0?'var(--fpl-pink)':'var(--fpl-green)'}">${totalHit>0?`<button type="button" onclick="openHitDetail(${g})" aria-label="Lihat detail potongan ${totalHit} poin pada GW${g}" style="font:inherit;color:inherit;background:rgba(255,40,130,.1);border:1px solid currentColor;border-radius:20px;min-width:48px;min-height:44px;cursor:pointer">${totalHit} ↗</button>`:0}</td></tr>`;
   });
-  hHtml+=`</tbody></table><p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem">GW3: Betelguese −8. Lainnya free / chip.</p>`;
+  hHtml+=`</tbody></table><p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem">Klik angka potongan untuk melihat rincian transfer hit per manager.</p>`;
   document.getElementById('hitsContent').innerHTML=hHtml;
   const hitByManager={};
   getAllGWs().forEach(g=>{LEAGUE_DATA[g].hits.forEach(h=>{hitByManager[h.team]=(hitByManager[h.team]||0)+h.cost})});
@@ -869,7 +874,66 @@ function jsonTreeHtml(val, key){
   return esc(String(val));
 }
 function lineupEscape(value){return String(value??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+const DECISION_DATA={"managers":{"Andri Varane":[{"gw":1,"team":"sinar muda fc","players":[{"id":109,"name":"Verbruggen","points":6,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":9,"starter":true,"captainExtra":0},{"id":334,"name":"Muharemović","points":6,"starter":true,"captainExtra":0},{"id":418,"name":"Maguire","points":1,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":8,"starter":true,"captainExtra":0},{"id":557,"name":"Tzolis","points":6,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":2,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":2,"starter":true,"captainExtra":2},{"id":165,"name":"João Pedro","points":11,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":2,"starter":false,"captainExtra":0},{"id":259,"name":"Diop","points":2,"starter":false,"captainExtra":0},{"id":335,"name":"Stach","points":13,"starter":false,"captainExtra":0},{"id":112,"name":"Van Hecke","points":1,"starter":false,"captainExtra":0}]},{"gw":2,"team":"sinar muda fc","players":[{"id":496,"name":"Kinsky","points":1,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":11,"starter":true,"captainExtra":0},{"id":334,"name":"Muharemović","points":4,"starter":true,"captainExtra":0},{"id":418,"name":"Maguire","points":4,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":4,"starter":true,"captainExtra":0},{"id":557,"name":"Tzolis","points":0,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":23,"starter":true,"captainExtra":23},{"id":335,"name":"Stach","points":4,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":8,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":13,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":9,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":0,"starter":false,"captainExtra":0},{"id":259,"name":"Diop","points":2,"starter":false,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":3,"starter":false,"captainExtra":0},{"id":112,"name":"Van Hecke","points":1,"starter":false,"captainExtra":0}]},{"gw":3,"team":"sinar muda fc","players":[{"id":82,"name":"Kelleher","points":2,"starter":true,"captainExtra":0},{"id":115,"name":"De Cuyper","points":4,"starter":true,"captainExtra":0},{"id":391,"name":"Gvardiol","points":8,"starter":true,"captainExtra":0},{"id":449,"name":"Hall","points":4,"starter":true,"captainExtra":0},{"id":454,"name":"Elanga","points":1,"starter":true,"captainExtra":0},{"id":366,"name":"Wirtz","points":3,"starter":true,"captainExtra":0},{"id":399,"name":"Cherki","points":3,"starter":true,"captainExtra":0},{"id":480,"name":"Gibbs-White","points":3,"starter":true,"captainExtra":0},{"id":106,"name":"Thiago","points":2,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":9,"starter":true,"captainExtra":9},{"id":379,"name":"Isak","points":13,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":3,"starter":false,"captainExtra":0},{"id":259,"name":"Diop","points":3,"starter":false,"captainExtra":0},{"id":73,"name":"Adams","points":4,"starter":false,"captainExtra":0},{"id":279,"name":"Ajayi","points":5,"starter":false,"captainExtra":0}]}],"Zava Anbiya":[{"gw":1,"team":"SCOUSER","players":[{"id":109,"name":"Verbruggen","points":6,"starter":true,"captainExtra":0},{"id":418,"name":"Maguire","points":1,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":9,"starter":true,"captainExtra":0},{"id":356,"name":"Virgil","points":2,"starter":true,"captainExtra":2},{"id":368,"name":"Szoboszlai","points":8,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":557,"name":"Tzolis","points":6,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":2,"starter":true,"captainExtra":0},{"id":379,"name":"Isak","points":2,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":11,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":2,"starter":false,"captainExtra":0},{"id":469,"name":"N.Williams","points":2,"starter":false,"captainExtra":0},{"id":532,"name":"Ballard","points":0,"starter":false,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":2,"starter":false,"captainExtra":0}]},{"gw":2,"team":"SCOUSER","players":[{"id":572,"name":"Tzolakis","points":10,"starter":true,"captainExtra":0},{"id":418,"name":"Maguire","points":4,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":11,"starter":true,"captainExtra":0},{"id":356,"name":"Virgil","points":1,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":4,"starter":true,"captainExtra":4},{"id":426,"name":"B.Fernandes","points":23,"starter":true,"captainExtra":0},{"id":557,"name":"Tzolis","points":0,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":11,"starter":true,"captainExtra":0},{"id":379,"name":"Isak","points":8,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":9,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":8,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":0,"starter":false,"captainExtra":0},{"id":469,"name":"N.Williams","points":6,"starter":false,"captainExtra":0},{"id":532,"name":"Ballard","points":8,"starter":false,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":3,"starter":false,"captainExtra":0}]},{"gw":3,"team":"SCOUSER","players":[{"id":572,"name":"Tzolakis","points":6,"starter":true,"captainExtra":0},{"id":391,"name":"Gvardiol","points":8,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":2,"starter":true,"captainExtra":0},{"id":532,"name":"Ballard","points":4,"starter":true,"captainExtra":0},{"id":469,"name":"N.Williams","points":7,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":3,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":8,"starter":true,"captainExtra":0},{"id":379,"name":"Isak","points":13,"starter":true,"captainExtra":13},{"id":165,"name":"João Pedro","points":1,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":3,"starter":false,"captainExtra":0},{"id":427,"name":"Mbeumo","points":8,"starter":false,"captainExtra":0},{"id":418,"name":"Maguire","points":2,"starter":false,"captainExtra":0},{"id":557,"name":"Tzolis","points":5,"starter":false,"captainExtra":0}]}],"Rendy P":[{"gw":1,"team":"Parpas","players":[{"id":496,"name":"Kinsky","points":2,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":5,"starter":true,"captainExtra":0},{"id":173,"name":"Thomas","points":3,"starter":false,"captainExtra":0},{"id":423,"name":"Shaw","points":1,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":8,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":2,"starter":true,"captainExtra":0},{"id":237,"name":"Ndiaye","points":9,"starter":true,"captainExtra":0},{"id":212,"name":"Hughes","points":0,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":2,"starter":true,"captainExtra":2},{"id":165,"name":"João Pedro","points":11,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":6,"starter":false,"captainExtra":0},{"id":272,"name":"Kusi-Asare","points":0,"starter":false,"captainExtra":0},{"id":476,"name":"O.Richards","points":0,"starter":false,"captainExtra":0},{"id":499,"name":"Pedro Porro","points":0,"starter":true,"captainExtra":0}]},{"gw":2,"team":"Parpas","players":[{"id":496,"name":"Kinsky","points":1,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":8,"starter":true,"captainExtra":0},{"id":499,"name":"Pedro Porro","points":1,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":2,"starter":true,"captainExtra":0},{"id":173,"name":"Thomas","points":8,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":23,"starter":true,"captainExtra":23},{"id":368,"name":"Szoboszlai","points":4,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":11,"starter":true,"captainExtra":0},{"id":237,"name":"Ndiaye","points":4,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":13,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":9,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":0,"starter":false,"captainExtra":0},{"id":212,"name":"Hughes","points":0,"starter":false,"captainExtra":0},{"id":476,"name":"O.Richards","points":0,"starter":false,"captainExtra":0},{"id":272,"name":"Kusi-Asare","points":0,"starter":false,"captainExtra":0}]},{"gw":3,"team":"Parpas","players":[{"id":109,"name":"Verbruggen","points":3,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":2,"starter":true,"captainExtra":0},{"id":499,"name":"Pedro Porro","points":7,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":4,"starter":true,"captainExtra":0},{"id":277,"name":"Egan","points":6,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":3,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":8,"starter":true,"captainExtra":0},{"id":124,"name":"Groß","points":1,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":9,"starter":true,"captainExtra":18},{"id":165,"name":"João Pedro","points":1,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":6,"starter":false,"captainExtra":0},{"id":173,"name":"Thomas","points":4,"starter":false,"captainExtra":0},{"id":272,"name":"Kusi-Asare","points":0,"starter":false,"captainExtra":0},{"id":212,"name":"Hughes","points":1,"starter":false,"captainExtra":0}]}],"Muhammad Fariz Azhari":[{"gw":1,"team":"Giri - giri","players":[{"id":496,"name":"Kinsky","points":2,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":5,"starter":true,"captainExtra":0},{"id":204,"name":"Mitchell","points":1,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":1,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":2,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":8,"starter":true,"captainExtra":0},{"id":124,"name":"Groß","points":2,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":2,"starter":true,"captainExtra":2},{"id":165,"name":"João Pedro","points":11,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":6,"starter":false,"captainExtra":0},{"id":173,"name":"Thomas","points":3,"starter":false,"captainExtra":0},{"id":323,"name":"McAteer","points":1,"starter":false,"captainExtra":0},{"id":277,"name":"Egan","points":8,"starter":false,"captainExtra":0}]},{"gw":2,"team":"Giri - giri","players":[{"id":496,"name":"Kinsky","points":1,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":8,"starter":true,"captainExtra":0},{"id":277,"name":"Egan","points":9,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":2,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":23,"starter":true,"captainExtra":23},{"id":427,"name":"Mbeumo","points":11,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":4,"starter":true,"captainExtra":0},{"id":124,"name":"Groß","points":13,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":13,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":9,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":8,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":0,"starter":false,"captainExtra":0},{"id":173,"name":"Thomas","points":8,"starter":false,"captainExtra":0},{"id":204,"name":"Mitchell","points":0,"starter":false,"captainExtra":0},{"id":323,"name":"McAteer","points":1,"starter":false,"captainExtra":0}]},{"gw":3,"team":"Giri - giri","players":[{"id":109,"name":"Verbruggen","points":3,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":2,"starter":true,"captainExtra":0},{"id":277,"name":"Egan","points":6,"starter":true,"captainExtra":0},{"id":593,"name":"Dedić","points":1,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":399,"name":"Cherki","points":3,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":3,"starter":true,"captainExtra":0},{"id":124,"name":"Groß","points":1,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":9,"starter":true,"captainExtra":18},{"id":165,"name":"João Pedro","points":1,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":6,"starter":false,"captainExtra":0},{"id":173,"name":"Thomas","points":4,"starter":false,"captainExtra":0},{"id":204,"name":"Mitchell","points":15,"starter":false,"captainExtra":0},{"id":323,"name":"McAteer","points":1,"starter":false,"captainExtra":0}]}],"Andre Nosega Purnama":[{"gw":1,"team":"King Polenk","players":[{"id":1,"name":"Raya","points":6,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":5,"starter":true,"captainExtra":0},{"id":387,"name":"O'Reilly","points":2,"starter":true,"captainExtra":0},{"id":11,"name":"Mosquera","points":6,"starter":true,"captainExtra":0},{"id":532,"name":"Ballard","points":0,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":40,"name":"Rogers","points":8,"starter":true,"captainExtra":0},{"id":236,"name":"Dewsbury-Hall","points":11,"starter":true,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":2,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":11,"starter":true,"captainExtra":11},{"id":552,"name":"Brobbey","points":2,"starter":true,"captainExtra":0},{"id":140,"name":"Sánchez","points":2,"starter":false,"captainExtra":0},{"id":499,"name":"Pedro Porro","points":0,"starter":false,"captainExtra":0},{"id":124,"name":"Groß","points":2,"starter":false,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":false,"captainExtra":0}]},{"gw":2,"team":"King Polenk","players":[{"id":1,"name":"Raya","points":6,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":8,"starter":true,"captainExtra":0},{"id":499,"name":"Pedro Porro","points":1,"starter":true,"captainExtra":0},{"id":532,"name":"Ballard","points":8,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":23,"starter":true,"captainExtra":23},{"id":40,"name":"Rogers","points":5,"starter":true,"captainExtra":0},{"id":236,"name":"Dewsbury-Hall","points":2,"starter":true,"captainExtra":0},{"id":542,"name":"E.Le Fée","points":3,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":9,"starter":true,"captainExtra":0},{"id":552,"name":"Brobbey","points":2,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":8,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":1,"starter":false,"captainExtra":0},{"id":387,"name":"O'Reilly","points":2,"starter":false,"captainExtra":0},{"id":124,"name":"Groß","points":13,"starter":false,"captainExtra":0},{"id":11,"name":"Mosquera","points":6,"starter":false,"captainExtra":0}]},{"gw":3,"team":"King Polenk","players":[{"id":1,"name":"Raya","points":3,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":2,"starter":false,"captainExtra":0},{"id":499,"name":"Pedro Porro","points":7,"starter":false,"captainExtra":0},{"id":532,"name":"Ballard","points":4,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":40,"name":"Rogers","points":6,"starter":true,"captainExtra":0},{"id":236,"name":"Dewsbury-Hall","points":2,"starter":true,"captainExtra":0},{"id":399,"name":"Cherki","points":3,"starter":true,"captainExtra":3},{"id":124,"name":"Groß","points":1,"starter":true,"captainExtra":0},{"id":165,"name":"João Pedro","points":1,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":6,"starter":false,"captainExtra":0},{"id":387,"name":"O'Reilly","points":0,"starter":true,"captainExtra":0},{"id":552,"name":"Brobbey","points":2,"starter":false,"captainExtra":0},{"id":11,"name":"Mosquera","points":0,"starter":true,"captainExtra":0}]}],"Vikri Nur Rohim":[{"gw":1,"team":"Betelguese","players":[{"id":109,"name":"Verbruggen","points":6,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":5,"starter":true,"captainExtra":0},{"id":388,"name":"Guéhi","points":10,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":1,"starter":true,"captainExtra":0},{"id":13,"name":"Rice","points":3,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":2,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":8,"starter":true,"captainExtra":0},{"id":398,"name":"Foden","points":1,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":1,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":2,"starter":true,"captainExtra":2},{"id":165,"name":"João Pedro","points":11,"starter":true,"captainExtra":0},{"id":496,"name":"Kinsky","points":2,"starter":false,"captainExtra":0},{"id":204,"name":"Mitchell","points":1,"starter":false,"captainExtra":0},{"id":124,"name":"Groß","points":2,"starter":false,"captainExtra":0},{"id":259,"name":"Diop","points":2,"starter":false,"captainExtra":0}]},{"gw":2,"team":"Betelguese","players":[{"id":109,"name":"Verbruggen","points":0,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":8,"starter":true,"captainExtra":0},{"id":388,"name":"Guéhi","points":2,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":2,"starter":true,"captainExtra":0},{"id":13,"name":"Rice","points":5,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":11,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":4,"starter":true,"captainExtra":0},{"id":398,"name":"Foden","points":9,"starter":true,"captainExtra":0},{"id":346,"name":"Calvert-Lewin","points":8,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":13,"starter":true,"captainExtra":13},{"id":165,"name":"João Pedro","points":9,"starter":true,"captainExtra":0},{"id":572,"name":"Tzolakis","points":10,"starter":false,"captainExtra":0},{"id":204,"name":"Mitchell","points":0,"starter":false,"captainExtra":0},{"id":124,"name":"Groß","points":13,"starter":false,"captainExtra":0},{"id":259,"name":"Diop","points":2,"starter":false,"captainExtra":0}]},{"gw":3,"team":"Betelguese","players":[{"id":572,"name":"Tzolakis","points":6,"starter":true,"captainExtra":0},{"id":4,"name":"Gabriel","points":2,"starter":true,"captainExtra":0},{"id":388,"name":"Guéhi","points":8,"starter":true,"captainExtra":0},{"id":423,"name":"Shaw","points":4,"starter":true,"captainExtra":0},{"id":565,"name":"M.Sangaré","points":0,"starter":true,"captainExtra":0},{"id":427,"name":"Mbeumo","points":8,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":3,"starter":true,"captainExtra":0},{"id":399,"name":"Cherki","points":3,"starter":true,"captainExtra":0},{"id":464,"name":"Wissa","points":1,"starter":true,"captainExtra":0},{"id":411,"name":"Haaland","points":9,"starter":true,"captainExtra":9},{"id":165,"name":"João Pedro","points":1,"starter":true,"captainExtra":0},{"id":109,"name":"Verbruggen","points":3,"starter":false,"captainExtra":0},{"id":124,"name":"Groß","points":1,"starter":false,"captainExtra":0},{"id":204,"name":"Mitchell","points":15,"starter":false,"captainExtra":0},{"id":259,"name":"Diop","points":3,"starter":false,"captainExtra":0}]}],"Indra Aprilian":[{"gw":2,"team":"Milenials","players":[{"id":412,"name":"Lammens","points":2,"starter":true,"captainExtra":0},{"id":88,"name":"Kayode","points":2,"starter":true,"captainExtra":0},{"id":586,"name":"Mendy","points":1,"starter":true,"captainExtra":0},{"id":115,"name":"De Cuyper","points":0,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":11,"starter":true,"captainExtra":0},{"id":229,"name":"Tarkowski","points":12,"starter":false,"captainExtra":0},{"id":427,"name":"Mbeumo","points":11,"starter":true,"captainExtra":0},{"id":426,"name":"B.Fernandes","points":23,"starter":true,"captainExtra":23},{"id":565,"name":"M.Sangaré","points":4,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":4,"starter":true,"captainExtra":0},{"id":106,"name":"Thiago","points":2,"starter":true,"captainExtra":0},{"id":384,"name":"Donnarumma","points":0,"starter":false,"captainExtra":0},{"id":25,"name":"Gyökeres","points":0,"starter":true,"captainExtra":0},{"id":397,"name":"Semenyo","points":5,"starter":false,"captainExtra":0},{"id":401,"name":"Marmoush","points":2,"starter":false,"captainExtra":0}]},{"gw":3,"team":"Milenials","players":[{"id":384,"name":"Donnarumma","points":7,"starter":true,"captainExtra":0},{"id":88,"name":"Kayode","points":1,"starter":true,"captainExtra":0},{"id":8,"name":"Calafiori","points":2,"starter":true,"captainExtra":0},{"id":586,"name":"Mendy","points":8,"starter":true,"captainExtra":0},{"id":115,"name":"De Cuyper","points":4,"starter":true,"captainExtra":0},{"id":399,"name":"Cherki","points":3,"starter":true,"captainExtra":3},{"id":426,"name":"B.Fernandes","points":2,"starter":true,"captainExtra":0},{"id":565,"name":"M.Sangaré","points":0,"starter":true,"captainExtra":0},{"id":397,"name":"Semenyo","points":6,"starter":true,"captainExtra":0},{"id":368,"name":"Szoboszlai","points":3,"starter":true,"captainExtra":0},{"id":106,"name":"Thiago","points":2,"starter":true,"captainExtra":0},{"id":412,"name":"Lammens","points":2,"starter":false,"captainExtra":0},{"id":25,"name":"Gyökeres","points":1,"starter":false,"captainExtra":0},{"id":229,"name":"Tarkowski","points":3,"starter":false,"captainExtra":0},{"id":401,"name":"Marmoush","points":2,"starter":false,"captainExtra":0}]}]}};
+function leagueChoiceRows(gw){
+ const players=new Map();
+ Object.entries(DECISION_DATA.managers).forEach(([manager,weeks])=>{
+  const week=weeks.find(w=>w.gw===gw);if(!week)return;
+  const captain=LINEUP_SEASON[manager]?.by_gameweek?.find(w=>w.gameweek===gw)?.captain;
+  const clean=n=>String(n||'').replace(/\s*\((C|VC)\)/g,'').trim();
+  week.players.forEach(p=>{if(!players.has(p.id))players.set(p.id,{id:p.id,name:p.name,starter:[],bench:[],captain:[]});const r=players.get(p.id),owner={manager,team:week.team};r[p.starter?'starter':'bench'].push(owner);if(clean(captain)===clean(p.name))r.captain.push(owner)});
+ });
+ return [...players.values()].sort((a,b)=>b.starter.length-a.starter.length||b.captain.length-a.captain.length||b.bench.length-a.bench.length||a.name.localeCompare(b.name));
+}
+function renderLeagueChoices(gw,showAll=false){
+ const rows=leagueChoiceRows(gw),visible=showAll?rows:rows.slice(0,10);
+ const count=(r,key)=>r[key].length?`<button type="button" onclick="openLeagueChoice(${gw},${r.id},'${key}')" style="min-width:44px;min-height:44px;color:var(--fpl-green);background:rgba(0,230,138,.08);border:1px solid var(--border);border-radius:20px;cursor:pointer" aria-label="Lihat ${r[key].length} manager ${key} ${lineupEscape(r.name)}">${r[key].length} ↗</button>`:'<span style="color:var(--muted)">0</span>';
+ document.getElementById('squadsContent').innerHTML=`<p class="lineup-description">Pilihan saat deadline GW${gw}, sebelum autosub. Kapten termasuk dalam jumlah starter/bench. Klik angka untuk melihat manager, atau nama pemain untuk membuka profil.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemain</th><th>Starter</th><th>Bench</th><th>Kapten</th></tr></thead><tbody>${visible.map(r=>`<tr><td>${playerProfileButton(r.name)}</td><td>${count(r,'starter')}</td><td>${count(r,'bench')}</td><td>${count(r,'captain')}</td></tr>`).join('')}</tbody></table></div><p style="font-size:.8rem;color:var(--muted);margin-top:.6rem">Menampilkan ${visible.length} dari ${rows.length} pemain · Diurutkan menurut jumlah starter.</p>${rows.length>10?`<button type="button" onclick="renderLeagueChoices(${gw},${!showAll})" style="margin-top:.6rem;min-height:44px;padding:.5rem 1rem;cursor:pointer">${showAll?'Tampilkan 10 teratas':'Lihat semua pemain'}</button>`:''}`;
+}
+function openLeagueChoice(gw,id,key){
+ const row=leagueChoiceRows(gw).find(r=>r.id===id);if(!row||!row[key]?.length)return;
+ let modal=document.getElementById('leagueChoiceModal');
+ if(!modal){modal=document.createElement('dialog');modal.id='leagueChoiceModal';modal.setAttribute('aria-labelledby','leagueChoiceTitle');modal.style.cssText='margin:auto;width:min(520px,94vw);max-height:85vh;overflow:auto;background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:1.2rem';document.body.append(modal)}
+ const label={starter:'Starter',bench:'Bench',captain:'Kapten'}[key];
+ modal.innerHTML=`<button type="button" onclick="document.getElementById('leagueChoiceModal').close()" style="float:right;min-height:44px;cursor:pointer">Tutup</button><h3 id="leagueChoiceTitle">${lineupEscape(row.name)}</h3><p style="color:var(--fpl-green);margin:.6rem 0">GW${gw} · ${label} · ${row[key].length} manager</p>${row[key].map(o=>`<div style="padding:.8rem 0;border-bottom:1px solid var(--border)"><strong>${lineupEscape(o.team)}</strong><small style="display:block;color:var(--muted)">${lineupEscape(o.manager)}</small></div>`).join('')}`;modal.showModal();
+}
+function playerProfileButton(name){
+ return `<button type="button" data-player-profile="${lineupEscape(name)}" style="font:inherit;font-weight:700;color:var(--fpl-green);background:none;border:0;border-bottom:1px dotted currentColor;padding:.35rem 0;cursor:pointer" aria-label="Buka profil ${lineupEscape(name)}">${lineupEscape(name)} ↗</button>`;
+}
+let playerProfileChart=null;
+function openPlayerProfile(name,selectedGW){
+ const all=Object.values(DECISION_DATA.managers).flat(),gws=[...new Set(all.map(w=>w.gw))].sort((a,b)=>a-b);
+ const gw=Number(selectedGW)||gws.at(-1),e=lineupEscape;
+ let modal=document.getElementById('playerProfileModal');
+ if(!modal){modal=document.createElement('dialog');modal.id='playerProfileModal';modal.setAttribute('aria-labelledby','playerProfileTitle');modal.style.cssText='margin:auto;width:min(720px,94vw);max-height:90vh;overflow:auto;border:1px solid var(--border);border-radius:16px;padding:1.2rem;background:var(--bg-card);color:var(--text)';document.body.append(modal);modal.addEventListener('close',()=>{playerProfileChart?.destroy();playerProfileChart=null});modal.addEventListener('click',ev=>{const r=modal.getBoundingClientRect();if(ev.target===modal&&(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom))modal.close()})}
+ playerProfileChart?.destroy();playerProfileChart=null;
+ const values=gws.map(g=>all.find(w=>w.gw===g&&w.players.some(p=>p.name===name))?.players.find(p=>p.name===name)?.points??null);
+ const owners=Object.entries(DECISION_DATA.managers).map(([manager,weeks])=>{const week=weeks.find(w=>w.gw===gw);return {manager,week,player:week?.players.find(p=>p.name===name)}}).filter(v=>v.player);
+ const transfers=[];
+ Object.entries(VERIFIED_HIT_TRANSFERS).forEach(([g,teams])=>Object.entries(teams).forEach(([team,record])=>record.transfers.forEach(t=>{if(t.out===name||t.incoming===name)transfers.push({gw:Number(g),team,text:t.incoming===name?'Dibeli menggantikan '+t.out:'Dijual, digantikan '+t.incoming})})));
+ modal.innerHTML=`<button type="button" id="closePlayerProfile" style="float:right;cursor:pointer;min-height:40px;padding:.4rem .8rem">Tutup</button><small style="color:var(--fpl-green)">PROFIL PEMAIN DALAM LIGA</small><h2 id="playerProfileTitle" style="margin:.6rem 0">${e(name)}</h2><p style="color:var(--muted);font-size:.8rem">Poin asli per GW · tanpa penggandaan kapten. GW tanpa data ditampilkan kosong.</p><div style="height:210px;margin:1rem 0"><canvas id="playerProfileCanvas" aria-label="Grafik poin ${e(name)}" role="img"></canvas></div><p style="font-size:.8rem">${gws.map((g,i)=>'GW'+g+': '+(values[i]??'belum tersedia')).join(' · ')}</p><label for="playerProfileGW">Status di liga · Gameweek</label><select id="playerProfileGW" style="margin:.6rem 0 1rem">${gws.map(g=>`<option value="${g}" ${g===gw?'selected':''}>GW${g}</option>`).join('')}</select><div style="display:grid;gap:.6rem">${owners.length?owners.map(({manager,week,player:p})=>`<div style="padding:.8rem;border:1px solid var(--border);border-radius:10px"><strong>${e(week.team)}</strong><small style="display:block;color:var(--muted)">${e(manager)}</small><p style="margin:.4rem 0">${p.starter?'Starter saat deadline':'Bench saat deadline'}${p.captainExtra?' · Penggandaan kapten aktif':''}</p><small>Poin asli: ${p.points} · Tambahan kapten aktual: ${p.captainExtra}</small></div>`).join(''):'<p>Tidak dimiliki oleh manager dengan data skuad yang tersedia pada GW ini.</p>'}</div><h3 style="margin-top:1.2rem">Riwayat transfer yang tersedia</h3>${transfers.length?transfers.sort((a,b)=>a.gw-b.gw).map(t=>`<p style="padding:.7rem 0;border-bottom:1px solid var(--border)"><strong>GW${t.gw} · ${e(t.team)}</strong><br>${e(t.text)}</p>`).join(''):'<p>Belum ada catatan transfer pemain ini dalam data yang tersimpan.</p>'}<p style="font-size:.75rem;color:var(--muted)">Riwayat transfer saat ini hanya mencakup rincian transfer hit yang sudah dimuat, bukan seluruh aktivitas liga. Status starter/bench mengacu pilihan awal; tambahan kapten memakai hasil penggandaan aktual.</p>`;
+ modal.querySelector('#closePlayerProfile').onclick=()=>modal.close();
+ modal.querySelector('#playerProfileGW').onchange=ev=>openPlayerProfile(name,ev.target.value);
+ if(!modal.open)modal.showModal();
+ if(typeof Chart!=='undefined')playerProfileChart=new Chart(document.getElementById('playerProfileCanvas'),{type:'line',data:{labels:gws.map(g=>'GW'+g),datasets:[{label:'Poin asli',data:values,borderColor:'#00E68A',backgroundColor:'#00E68A22',pointRadius:5,borderWidth:3,tension:0,spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true},x:{offset:true}}}});
+}
+document.addEventListener('click',event=>{const button=event.target.closest('[data-player-profile]');if(button)openPlayerProfile(button.dataset.playerProfile)});
+function renderManagerDecisions(manager){
+ const rows=DECISION_DATA.managers[manager]||[],players=new Map(),e=lineupEscape;
+ rows.forEach(w=>w.players.forEach(p=>{if(!players.has(p.id))players.set(p.id,{name:p.name,weeks:[],start:[],bench:[],total:0});const a=players.get(p.id);a.weeks.push(w.gw);a[p.starter?'start':'bench'].push(p.points);a.total+=p.points}));
+ const records=[...players.values()].map(p=>{let run=0,longest=0,prev=-2;p.weeks.sort((a,b)=>a-b).forEach(g=>{run=g===prev+1?run+1:1;longest=Math.max(longest,run);prev=g});return {...p,longest}}).sort((a,b)=>b.longest-a.longest||b.weeks.length-a.weeks.length||b.total-a.total);
+ const avg=a=>a.reduce((s,v)=>s+v,0)/a.length;
+ const dilemmas=records.filter(p=>p.start.length&&p.bench.length).map(p=>({...p,sa:avg(p.start),ba:avg(p.bench)})).sort((a,b)=>(b.ba-b.sa)-(a.ba-a.sa));
+ document.getElementById('managerDecisions').innerHTML=`<h3>Pola Keputusan Manager</h3><p class="lineup-description">${rows.length} GW tersedia · ${e(manager)} · Pilihan starter sebelum autosub, poin asli tanpa penggandaan kapten.</p><details open><summary style="cursor:pointer;padding:.8rem 0;font-weight:700">Kesabaran Manager</summary><p class="lineup-description">Rentang kepemilikan terpanjang berdasarkan skuad di setiap deadline yang tersedia. Poin mencakup starter dan bench, bukan kontribusi bersih ke skor tim.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemain</th><th>GW beruntun</th><th>Total GW dimiliki</th><th>Starter</th><th>Poin asli</th></tr></thead><tbody>${records.map(p=>`<tr><td>${playerProfileButton(p.name)}</td><td><strong>${p.longest}</strong></td><td>${p.weeks.length}</td><td>${p.start.length}</td><td>${p.total}</td></tr>`).join('')}</tbody></table></div></details><details><summary style="cursor:pointer;padding:.8rem 0;font-weight:700">Dilema Starter & Bench</summary><p class="lineup-description">Rata-rata poin saat dipasang dibanding saat dicadangkan. Jumlah sampel ditampilkan agar perbandingannya jelas; autosub tidak mengubah kategori awal.</p>${dilemmas.length?dilemmas.map(p=>`<div style="padding:1rem;border:1px solid var(--border);border-radius:10px;margin-bottom:.6rem"><strong>${playerProfileButton(p.name)}</strong><div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.6rem"><span>Starter: <b>${p.sa.toFixed(1)}</b> poin/GW <small>(${p.start.length} GW)</small></span><span>Bench: <b>${p.ba.toFixed(1)}</b> poin/GW <small>(${p.bench.length} GW)</small></span></div><small style="color:var(--muted)">${p.ba>p.sa?'Lebih produktif ketika dicadangkan':p.ba===p.sa?'Rata-rata poin sama':'Lebih produktif ketika dipasang'}${Math.min(p.start.length,p.bench.length)<3?' · Sampel masih sedikit':''}</small></div>`).join(''):'<p>Belum ada pemain yang tercatat pernah menjadi starter sekaligus cadangan pada GW berbeda.</p>'}</details>`;
+}
+function renderDifferentials(gw){
+ const teams=Object.entries(DECISION_DATA.managers).map(([manager,weeks])=>({manager,week:weeks.find(w=>w.gw===gw)})).filter(v=>v.week),players=new Map();
+ teams.forEach(({manager,week})=>week.players.filter(p=>p.starter).forEach(p=>{if(!players.has(p.id))players.set(p.id,{...p,owners:[]});players.get(p.id).owners.push(week.team)}));
+ const picks=[...players.values()].filter(p=>p.owners.length===1&&p.points>=6).sort((a,b)=>b.points-a.points);
+ document.getElementById('differentialPlayers').innerHTML=`<p class="lineup-description">GW${gw} · Minimal 6 poin asli dan hanya dipasang sebagai starter oleh 1 dari ${teams.length} manager dengan data tersedia. Bench dan autosub tidak dihitung sebagai pilihan starter.</p>${teams.length<2?'<p>Belum cukup data manager untuk perbandingan.</p>':picks.length?'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem">'+picks.map(p=>`<div style="border:1px solid var(--border);border-top:3px solid var(--fpl-green);border-radius:10px;padding:1rem"><small style="color:var(--fpl-green)">PEMAIN PEMBEDA · GW${gw}</small><h3 style="margin:.5rem 0">${playerProfileButton(p.name)} · ${p.points} poin</h3><p>${lineupEscape(p.owners[0])}</p><small style="color:var(--muted)">Starter: 1 dari ${teams.length} manager<br>Poin asli: ${p.points} · Tambahan kapten aktual: ${p.captainExtra}</small></div>`).join('')+'</div>':'<p>Tidak ada pemain yang memenuhi kriteria pada GW ini.</p>'}`;
+}
 function renderLineupSeason(managerName){
+  renderManagerDecisions(managerName);
   const data=typeof LINEUP_SEASON==='undefined'?null:LINEUP_SEASON[managerName];
   const tree=document.getElementById('lineupTree');
   const select=document.getElementById('lineupGwSelect');
@@ -911,6 +975,17 @@ function positionContributionHtml(players){
   }).join('')}<p class="position-note">Poin sudah termasuk pengali kapten dan autosub pada posisi pemain terkait. Total dihitung dari pemain yang tercantum, sebelum potongan transfer.${total<=0?' Persentase tidak ditampilkan karena total poin nol atau negatif.':''}${negative?' Batang menunjukkan besar poin; warna merah menandakan poin negatif.':''}</p></section>`;
 }
 
+const LINEUP_TRANSFER_TIMING={"checkedAt":"2026-09-09T20:44:19.593909+00:00","deadlines":{"1":"2026-08-21T17:30:00Z","2":"2026-08-28T17:30:00Z","3":"2026-09-04T17:30:00Z","4":"2026-09-12T12:30:00Z","5":"2026-09-18T17:30:00Z","6":"2026-10-10T10:00:00Z","7":"2026-10-17T10:00:00Z","8":"2026-10-23T17:30:00Z","9":"2026-10-31T11:00:00Z","10":"2026-11-07T13:30:00Z","11":"2026-11-21T13:30:00Z","12":"2026-11-28T13:30:00Z","13":"2026-12-02T18:30:00Z","14":"2026-12-05T13:30:00Z","15":"2026-12-12T13:30:00Z","16":"2026-12-19T13:30:00Z","17":"2026-12-26T13:30:00Z","18":"2026-12-30T18:30:00Z","19":"2027-01-02T13:30:00Z","20":"2027-01-06T18:30:00Z","21":"2027-01-16T13:30:00Z","22":"2027-01-23T13:30:00Z","23":"2027-01-30T13:30:00Z","24":"2027-02-06T13:30:00Z","25":"2027-02-10T18:30:00Z","26":"2027-02-20T13:30:00Z","27":"2027-02-27T13:30:00Z","28":"2027-03-03T18:30:00Z","29":"2027-03-13T13:30:00Z","30":"2027-03-20T13:30:00Z","31":"2027-04-10T12:30:00Z","32":"2027-04-17T12:30:00Z","33":"2027-04-24T12:30:00Z","34":"2027-05-01T12:30:00Z","35":"2027-05-08T12:30:00Z","36":"2027-05-15T12:30:00Z","37":"2027-05-23T12:30:00Z","38":"2027-05-30T13:30:00Z"},"managers":{"Andri Varane":{"entry":8053678,"transfers":[{"event":3,"time":"2026-09-04T16:49:07.195489Z"},{"event":3,"time":"2026-09-04T16:49:07.195195Z"},{"event":3,"time":"2026-09-04T16:49:07.194973Z"},{"event":3,"time":"2026-09-04T16:49:07.194705Z"},{"event":3,"time":"2026-09-04T16:49:07.194334Z"},{"event":3,"time":"2026-09-04T16:49:07.194125Z"},{"event":3,"time":"2026-09-04T16:49:07.193885Z"},{"event":3,"time":"2026-09-04T16:49:07.193502Z"},{"event":3,"time":"2026-09-04T16:49:07.193269Z"},{"event":3,"time":"2026-09-04T16:49:07.193054Z"},{"event":3,"time":"2026-09-04T16:49:07.192826Z"},{"event":3,"time":"2026-09-04T16:49:07.192538Z"}]},"Zava Anbiya":{"entry":6983338,"transfers":[{"event":3,"time":"2026-09-01T01:28:35.089237Z"},{"event":2,"time":"2026-08-28T04:58:49.815943Z"}]},"Rendy P":{"entry":6842653,"transfers":[{"event":3,"time":"2026-09-02T12:07:58.921759Z"},{"event":3,"time":"2026-09-02T12:07:58.914254Z"}]},"Muhammad Fariz Azhari":{"entry":2182880,"transfers":[{"event":3,"time":"2026-09-04T07:49:58.920138Z"},{"event":3,"time":"2026-09-04T07:06:11.084320Z"}]},"Andre Nosega Purnama":{"entry":8288623,"transfers":[{"event":3,"time":"2026-09-02T16:53:56.606111Z"},{"event":2,"time":"2026-08-28T06:15:26.529080Z"}]},"Vikri Nur Rohim":{"entry":6484808,"transfers":[{"event":3,"time":"2026-09-04T14:22:37.393850Z"},{"event":3,"time":"2026-09-04T14:22:37.393374Z"},{"event":3,"time":"2026-09-04T14:22:37.384025Z"},{"event":2,"time":"2026-08-28T15:35:47.440307Z"}]},"Indra Aprilian":{"entry":9873319,"transfers":[{"event":3,"time":"2026-09-04T11:09:42.535355Z"}]}}};
+function lineupTimingHtml(manager,gw){
+ const data=LINEUP_TRANSFER_TIMING,record=data.managers[manager],deadline=data.deadlines[gw];
+ const transfers=record?.transfers?.filter(t=>String(t.event)===String(gw))||[];
+ const last=transfers.map(t=>t.time).sort().at(-1);
+ const format=t=>new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).format(new Date(t))+' WIB';
+ let gap='—';
+ if(last&&deadline){const minutes=Math.floor((Date.parse(deadline)-Date.parse(last))/60000);gap=minutes<0?'Waktu transfer melewati deadline; perlu verifikasi':minutes===0?'Kurang dari 1 menit sebelum deadline':(minutes>=1440?Math.floor(minutes/1440)+' hari ':'')+(minutes>=60?Math.floor(minutes%1440/60)+' jam ':'')+(minutes%60)+' menit sebelum deadline';}
+ const items=[['Deadline GW'+gw,deadline?format(deadline):'Belum tersedia'],['Transfer terakhir',last?format(last):record?'Tidak ada transfer pada GW ini':'Riwayat transfer belum tersedia'],['Jarak ke deadline',gap]];
+ return `<section aria-label="Waktu transfer manager" style="margin:1rem 0"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.6rem">${items.map(([label,value])=>`<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:.8rem"><small style="color:var(--muted)">${lineupEscape(label)}</small><div style="font-size:.85rem;font-weight:600;margin-top:.35rem">${lineupEscape(value)}</div></div>`).join('')}</div><p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Waktu transfer, bukan waktu terakhir menyimpan line-up atau mengganti kapten. Snapshot API FPL · ${lineupEscape(format(data.checkedAt))}.</p></section>`;
+}
 function renderLineupWeek(managerName){
   const data=typeof LINEUP_SEASON==='undefined'?null:LINEUP_SEASON[managerName];
   const gw=document.getElementById('lineupGwSelect').value;
@@ -918,6 +993,9 @@ function renderLineupWeek(managerName){
   const target=document.getElementById('lineupTable');
   if(!week){target.textContent='Belum ada data line-up untuk manager ini.';return}
   const e=lineupEscape;
+  let timing=document.getElementById('lineupTiming');
+  if(!timing){timing=document.createElement('div');timing.id='lineupTiming';target.before(timing)}
+  timing.innerHTML=lineupTimingHtml(managerName,gw);
   const status={started:'Starter',selected_no_play:'Tidak bermain',autosub:'Masuk dari bench'};
   const playerCard=p=>{
     const captain=p.captain_multiplier>1;
@@ -1017,6 +1095,253 @@ document.getElementById('btnPdfLineup').addEventListener('click',()=>{
  finally{button.disabled=false}
 });
 
+let weeklyPointsChartInst=null,weeklyPointsChartSeries=[],weeklyPointsChartLabels=[],weeklyPointsFullSeries=[],weeklyPointsFullLabels=[],weeklyPointsHybridFocused=false,weeklyAnimRafId=null,weeklyAnimPlaying=false;
+function stopWeeklyAnimation(){if(weeklyAnimRafId)cancelAnimationFrame(weeklyAnimRafId);weeklyAnimRafId=null;weeklyAnimPlaying=false;const a=document.getElementById('btnAnimWeeklyPoints'),p=document.getElementById('btnPdfWeeklyPoints');if(a){a.disabled=false;a.textContent='▶ Putar Animasi';a.style.opacity='1'}if(p){p.disabled=false;p.style.opacity='1';p.style.cursor='pointer'}}
+function renderWeeklyPerformance(){const gws=getAllGWs(),latest=LEAGUE_DATA[Math.max(...gws)].standings,colors=['#00C853','#2979FF','#FF6D00','#AA00FF','#00B8D4','#D50000','#FFD600'];weeklyPointsFullLabels=['Start',...gws.map(g=>'GW'+g)];weeklyPointsFullSeries=latest.map((r,i)=>({label:r.team,color:colors[i%colors.length],values:[0,...gws.map(g=>LEAGUE_DATA[g].standings.find(v=>v.manager===r.manager)?.gw??null)]}));buildWeeklyPointsChart();}
+// Season records use actual GW data only, never the synthetic Start baseline.
+const VERIFIED_HIT_TRANSFERS={3:{Betelguese:{entry:6484808,transfers:[{out:'Calvert-Lewin',incoming:'Wissa',outPoints:1,inPoints:1},{out:'Foden',incoming:'Cherki',outPoints:1,inPoints:3},{out:'Rice',incoming:'M.Sangaré',outPoints:5,inPoints:0}]}}};
+function hitTransferPlayers(gw,hit){
+ const record=VERIFIED_HIT_TRANSFERS[gw]?.[hit.team],esc=lineupEscape;
+ if(!record)return '<p style="color:var(--muted)">Riwayat pemain yang ditransfer belum tersedia untuk manager ini.</p>';
+ const incoming=record.transfers.reduce((s,t)=>s+t.inPoints,0),outgoing=record.transfers.reduce((s,t)=>s+t.outPoints,0),net=incoming-outgoing-Number(hit.cost);
+ return `<div style="margin-top:1rem"><h4>Pemain keluar & masuk</h4>${record.transfers.map(t=>`<div style="display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:.6rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--border)"><div><small style="color:var(--muted)">KELUAR</small><br><strong>${esc(t.out)}</strong><br><small>${t.outPoints} poin GW${gw}</small></div><span style="color:var(--fpl-green)">→</span><div><small style="color:var(--muted)">MASUK</small><br><strong>${esc(t.incoming)}</strong><br><small>${t.inPoints} poin GW${gw}</small></div></div>`).join('')}<div style="padding:1rem;background:rgba(255,255,255,.04);border-radius:10px;margin-top:.8rem"><strong>Perbandingan poin GW${gw}</strong><p style="line-height:1.8;margin:.5rem 0">Pemain masuk: <b>${incoming}</b> · Pemain keluar: <b>${outgoing}</b><br>Selisih setelah hit: ${incoming} − ${outgoing} − ${Number(hit.cost)} = <strong style="color:var(--fpl-pink)">${net>0?'+':''}${net} poin</strong></p><small style="color:var(--muted)">Poin asli pemain pada GW yang sama, tanpa penggandaan kapten. Ini perbandingan sederhana, bukan perubahan pasti pada skor tim karena starter dan bench bisa berbeda.</small></div><p style="font-size:.75rem;margin-top:.7rem;color:var(--muted)">Sumber: <a href="https://fantasy.premierleague.com/api/entry/${record.entry}/transfers/" target="_blank" rel="noopener">Riwayat transfer FPL</a> · <a href="https://fantasy.premierleague.com/api/event/${gw}/live/" target="_blank" rel="noopener">Poin GW${gw}</a>. Data tersimpan; belum diperbarui otomatis.</p></div>`;
+}
+function openHitDetail(gw){
+ const data=LEAGUE_DATA[gw],hits=(data?.hits||[]).filter(h=>Number(h.cost)>0);if(!hits.length)return;
+ const esc=lineupEscape;
+ document.getElementById('hitDetailTitle').textContent='Transfer Hit · GW'+gw;
+ document.getElementById('hitDetailSummary').textContent=hits.length+' manager · Total potongan −'+hits.reduce((sum,h)=>sum+Number(h.cost),0)+' poin';
+ document.getElementById('hitDetailBody').innerHTML=hits.map(h=>{
+  const note=(data.chips||[]).find(c=>c.team===h.team)?.note||'';
+  const match=note.match(/\b(\d+)\s+transfer\b/i),count=match?Number(match[1]):null;
+  const paid=Number(h.cost)/4;
+  return `<section style="border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:.8rem"><div style="display:flex;justify-content:space-between;gap:1rem;align-items:center"><div><strong>${esc(h.team)}</strong><p style="font-size:.8rem;color:var(--muted);margin:.3rem 0">${esc(h.manager||'')}</p></div><strong style="font-size:1.6rem;color:var(--fpl-pink);white-space:nowrap">−${Number(h.cost)} <small style="font-size:.75rem">poin</small></strong></div><div style="padding:.8rem 0;border-top:1px solid var(--border);margin-top:.7rem;line-height:1.8">Jumlah transfer: <strong>${count??'Belum tercatat'}</strong><br>Transfer berbayar: <strong>${Number.isInteger(paid)?paid+' × −4 poin':'Belum dapat dirinci'}</strong>${count!==null&&Number.isInteger(paid)&&count>=paid?'<br>Transfer tanpa potongan: <strong>'+(count-paid)+'</strong>':''}</div><p style="font-size:.78rem;color:var(--muted)">${count!==null?'Jumlah transfer berasal dari catatan GW. ':''}Transfer berbayar dihitung dari total potongan ÷ 4; saldo free transfer belum tercatat.</p>${hitTransferPlayers(gw,h)}</section>`;
+ }).join('');
+ document.getElementById('hitDetailModal').showModal();
+}
+function weeklyMilestones(){
+ const gws=getAllGWs(),events=[];
+ weeklyPointsFullSeries.forEach(s=>{
+  const points=gws.map((g,i)=>({g,y:s.values[i+1]})).filter(p=>p.y!=null);
+  const peak=Math.max(...points.map(p=>p.y));
+  const gains=points.slice(1).map((p,i)=>({...p,delta:p.g===points[i].g+1?p.y-points[i].y:0}));
+  const gain=Math.max(0,...gains.map(p=>p.delta));
+  points.forEach(p=>{
+   const messages=[];
+   if(points.length>1&&p.y===peak)messages.push('Rekor pribadi musim ini: '+p.y+' poin');
+   if(gain>0&&gains.some(v=>v.g===p.g&&v.delta===gain))messages.push('Lonjakan terbesar: +'+gain+' poin dari GW sebelumnya');
+   (LEAGUE_DATA[p.g].chips||[]).filter(c=>c.team===s.label&&c.chip&&!['-','—','–'].includes(String(c.chip).trim())).forEach(c=>messages.push('Chip digunakan: '+c.chip));
+   const x=weeklyPointsChartLabels.indexOf('GW'+p.g);
+   if(messages.length&&x>0)events.push({x,y:p.y,team:s.label,color:s.color,messages});
+  });
+ });
+ return events.sort((a,b)=>a.x-b.x);
+}
+const weeklyMilestonePlugin={
+ id:'weeklyMilestones',
+ afterDatasetsDraw(chart){
+  const ctx=chart.ctx;chart.$eventHits=[];
+  weeklyMilestones().forEach(e=>{
+   const di=weeklyPointsChartSeries.findIndex(s=>s.label===e.team);
+   if(!chart.isDatasetVisible(di)||e.x>(chart.$revealed??Infinity))return;
+   const x=chart.scales.x.getPixelForValue(e.x),y=chart.scales.y.getPixelForValue(e.y);
+   ctx.save();ctx.strokeStyle=e.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.stroke();ctx.restore();
+   chart.$eventHits.push({x,y,event:e});
+  });
+  const e=chart.$activeEvent;if(!e)return;
+  const width=Math.min(330,chart.width-20),x=Math.max(10,Math.min(chart.width-width-10,chart.scales.x.getPixelForValue(e.x)-width/2));
+  ctx.save();ctx.font='12px Inter, sans-serif';
+  const lines=[];[e.team+' · '+weeklyPointsChartLabels[e.x],...e.messages].forEach(t=>{let line='';t.split(' ').forEach(word=>{const next=line?line+' '+word:word;if(ctx.measureText(next).width>width-24&&line){lines.push(line);line=word}else line=next});lines.push(line)});
+  const height=lines.length*18+22,y=Math.max(8,Math.min(chart.chartArea.bottom-height,chart.scales.y.getPixelForValue(e.y)-height-16));
+  ctx.globalAlpha=chart.$eventAlpha??1;ctx.fillStyle='#25102F';ctx.fillRect(x,y,width,height);ctx.strokeStyle=e.color;ctx.strokeRect(x,y,width,height);ctx.fillStyle='#FFFFFF';lines.forEach((line,i)=>ctx.fillText(line,x+12,y+20+i*18));ctx.restore();
+ },
+ afterEvent(chart,args){
+  if(args.event.type!=='click'||weeklyAnimPlaying)return;
+  const hit=(chart.$eventHits||[]).find(h=>Math.hypot(h.x-args.event.x,h.y-args.event.y)<20);
+  chart.$activeEvent=hit?.event||null;chart.$eventAlpha=1;args.changed=true;
+ }
+};
+const weeklyPointsTipPlugin={
+  id:'weeklyPointsTipDots',
+  afterDatasetsDraw(chart){
+    if(chart.canvas.id!=='weeklyPointsChart'||!weeklyPointsChartSeries.length)return;
+    const finalX=weeklyPointsChartLabels.length-1;
+    const progress=chart.$progress??finalX;
+    if(progress>=finalX-1e-6)return;
+    const xScale=chart.scales.x,yScale=chart.scales.y,ctx=chart.ctx;
+    weeklyPointsChartSeries.forEach(s=>{
+      const vals=s.values;
+      let y;
+      if(progress<=0){y=vals[0]}
+      else{
+        const i0=Math.floor(progress),i1=Math.min(i0+1,vals.length-1),t=progress-i0;
+        if(vals[i0]==null||vals[i1]==null)return; y=vals[i0]+(vals[i1]-vals[i0])*t;
+      }
+      if(y==null)return; const px=xScale.getPixelForValue(progress),py=yScale.getPixelForValue(y);
+      ctx.save();
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle=s.color;ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle='#2B1030';ctx.stroke();
+      ctx.restore();
+    });
+  }
+};
+function buildWeeklyPointsChart(forceOverview){
+  stopWeeklyAnimation();
+  if(weeklyPointsChartInst)weeklyPointsChartInst.destroy();
+  const showFocused=weeklyPointsHybridFocused&&!forceOverview&&weeklyPointsFullLabels.length>2;
+  let labels,seriesForView,yCfg;
+  if(!showFocused){
+    labels=weeklyPointsFullLabels;
+    seriesForView=weeklyPointsFullSeries;
+    const allValues=weeklyPointsFullSeries.flatMap(s=>s.values);
+    yCfg={beginAtZero:true,min:Math.min(0,...allValues.filter(v=>v!=null)),max:Math.ceil(Math.max(0,...allValues.filter(v=>v!=null))/20)*20+20};
+  }else{
+    const totalPts=weeklyPointsFullLabels.length;
+    const n=Math.min(HYBRID_FOCUS_N,totalPts-1);
+    const startIdx=totalPts-n;
+    labels=['Start',...weeklyPointsFullLabels.slice(startIdx)];
+    seriesForView=weeklyPointsFullSeries.map(s=>({label:s.label,color:s.color,values:[0,...s.values.slice(startIdx)]}));
+    yCfg=Object.assign({beginAtZero:false},(()=>{const v=seriesForView.flatMap(s=>s.values).filter(v=>v!=null);return {min:Math.floor((Math.min(...v)-10)/10)*10,max:Math.ceil((Math.max(...v)+10)/10)*10}})());
+  }
+  weeklyPointsChartSeries=seriesForView;
+  weeklyPointsChartLabels=labels;
+  const finalMaxX=labels.length-1;
+  const datasets=seriesForView.map(s=>({
+    label:s.label,data:s.values.map((y,i)=>({x:i,y})),
+    borderColor:s.color,backgroundColor:s.color+'22',borderWidth:2.5,
+    pointRadius:4,pointHoverRadius:6,tension:0,fill:false
+  }));
+  weeklyPointsChartInst=new Chart(document.getElementById('weeklyPointsChart'),{
+    type:'line',data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' pts'}}},
+      scales:{
+        y:Object.assign({title:{display:true,text:'Poin GW'},grid:{color:'rgba(255,255,255,0.06)'}},yCfg),
+        x:{type:'linear',min:0,max:finalMaxX,
+          ticks:{stepSize:1,color:'#8B7A8E',callback:v=>(Math.abs(v-Math.round(v))<0.01?(weeklyPointsChartLabels[Math.round(v)]??''):'')},
+          title:{display:true,text:'Gameweek'},grid:{display:false}}
+      }
+    },
+    plugins:[weeklyPointsTipPlugin,weeklyMilestonePlugin]
+  });
+  weeklyPointsChartInst.$progress=finalMaxX;
+  const btnHybrid=document.getElementById('btnHybridWeeklyPoints');
+  if(btnHybrid){
+    btnHybrid.style.display=weeklyPointsFullLabels.length>2?'inline-flex':'none';
+    btnHybrid.textContent=weeklyPointsHybridFocused?'↩ Kembali ke Overview':('🔍 Fokus ke '+Math.min(HYBRID_FOCUS_N,weeklyPointsFullLabels.length-1)+' GW Terakhir');
+  }
+}
+function buildWeeklyPointsChartPDF(){
+ if(!window.jspdf?.jsPDF)throw new Error('PDF belum siap. Periksa koneksi lalu coba lagi.');
+ const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
+ pdf.addFileToVFS('FPL-Regular.ttf',LINEUP_PDF_FONT);pdf.addFont('FPL-Regular.ttf','FPL','normal');
+ pdf.addFileToVFS('FPL-Bold.ttf',LINEUP_PDF_BOLD);pdf.addFont('FPL-Bold.ttf','FPL','bold');
+ const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
+ const gws=getAllGWs(),last=gws[gws.length-1],rows=[...LEAGUE_DATA[last].standings].sort((a,b)=>b.gw-a.gw);
+ if(!rows.length)throw new Error('Data klasemen belum tersedia.');
+ const text=(x,y,v,size=9,col='#272439',bold=false)=>{pdf.setFont('FPL',bold?'bold':'normal');pdf.setFontSize(size);pdf.setTextColor(col);pdf.text(String(v??'—'),x,y)};
+ const box=(x,y,w,h,col)=>{pdf.setFillColor(col);pdf.rect(x,y,w,h,'F')};
+ const fit=(x,y,v,width,size,col,bold=false)=>{pdf.setFont('FPL',bold?'bold':'normal');pdf.setFontSize(size);while(pdf.getTextWidth(String(v))>width&&size>7){size-=.5;pdf.setFontSize(size)}text(x,y,v,size,col,bold)};
+ const purple='#281239',mint='#00E68A',range='GW'+gws[0]+' - GW'+last;
+ box(0,0,W,H,'#F6F7FB');box(0,0,W,100,purple);box(32,22,4,12,mint);text(47,31,'QA NIPPON PAINT / FPL LEAGUE',9,'#CABAD7',true);text(32,64,'Poin per Gameweek',26,'#FFFFFF',true);text(33,84,'Naik-turun poin per GW sesuai data klasemen',10,'#D8CCE2');box(W-160,26,128,42,mint);text(W-146,48,range,12,purple,true);text(W-146,63,'MUSIM '+(document.querySelector('.header')?.dataset.season||''),8,purple);
+ const gap=rows.length>1?rows[0].gw-rows[1].gw:null;
+ [[32,330,'TERTINGGI GW TERBARU',rows[0].team+' · '+rows[0].gw+' poin'],[374,245,'GAP KE POSISI 2',gap===null?'—':gap+' poin'],[631,178,'PESERTA',rows.length+' manager']].forEach(([x,w,l,v])=>{box(x,115,w,57,'#FFFFFF');box(x,115,3,57,'#00C580');text(x+13,133,l,8,'#717184',true);fit(x+13,156,v,w-26,16,purple,true)});
+ box(32,187,W-64,317,'#FFFFFF');text(48,207,'TOTAL POIN',8,'#727487',true);
+ const left=72,right=613,top=226,bottom=465;
+ const allValues=gws.flatMap(g=>LEAGUE_DATA[g].standings.map(r=>r.gw));
+ const max=Math.max(...allValues,1),step=Math.max(1,Math.ceil(max/5/Math.pow(10,Math.floor(Math.log10(max/5))))*Math.pow(10,Math.floor(Math.log10(max/5))));
+ const upper=Math.ceil(max/step)*step,lower=Math.min(0,Math.floor(Math.min(...allValues)/step)*step);
+ const py=v=>bottom-(v-lower)/(upper-lower)*(bottom-top),px=g=>left+(g-gws[0]+1)/(last-gws[0]+1)*(right-left);
+ for(let v=lower;v<=upper+.001;v+=step){const y=py(v);pdf.setDrawColor('#E6E8F0');pdf.setLineWidth(.6);pdf.line(left,y,right,y);text(43,y+3,Number(v.toFixed(2)),8,'#777889')}
+ text(left-10,bottom+20,'Start',9,'#68687B'); const stride=Math.max(1,Math.ceil(gws.length/10));gws.forEach((g,i)=>{if(i%stride===0||i===gws.length-1)text(px(g)-10,bottom+20,'GW'+g,9,'#68687B')});
+ const colors=['#009C62','#2867D5','#D16B11','#8B43CF','#009CB4','#D83E64','#A58400'];
+ const spacing=Math.min(22,(bottom-top)/Math.max(rows.length-1,1));let labels=[];
+ rows.forEach((r,i)=>labels.push(i?Math.max(py(r.gw),labels[i-1]+spacing):py(r.gw)));
+ if(labels.at(-1)>bottom){const shift=labels.at(-1)-bottom;labels=labels.map(y=>y-shift)}
+ rows.forEach((r,i)=>{
+  const colorIndex=LEAGUE_DATA[last].standings.findIndex(v=>v.manager===r.manager); const col=colors[colorIndex%colors.length];pdf.setDrawColor(col);pdf.setLineWidth(2.1);let previous=[left,py(0)];pdf.setFillColor('#FFFFFF');pdf.circle(...previous,2.8,'FD');
+  for(const g of gws){const row=LEAGUE_DATA[g].standings.find(v=>v.manager===r.manager);if(!row){previous=null;continue}const point=[px(g),py(row.gw)];if(previous)pdf.line(...previous,...point);pdf.setFillColor('#FFFFFF');pdf.circle(...point,2.8,'FD');previous=point}
+  const endX=px(last),endY=py(r.gw),ly=labels[i];pdf.setLineWidth(.7);pdf.line(endX+4,endY,endX+14,endY);pdf.line(endX+14,endY,647,ly);pdf.line(647,ly,656,ly);fit(664,ly+3,r.team,112,8.5,col,true);text(782,ly+3,r.gw,9,col,true);
+ });
+ const late=rows.filter(r=>!LEAGUE_DATA[gws[0]].standings.some(v=>v.manager===r.manager));
+ text(48,497,late.length?'Garis dimulai dari GW pertama tim tercatat; data yang belum tersedia tidak dianggap 0.':'Grafik mencakup seluruh gameweek yang tersedia.',7.7,'#747589');
+ const summary=gap===null?'Satu manager tercatat pada gameweek terbaru.':'Selisih GW terbaru '+gap+' poin: '+rows[0].team+' ('+rows[0].gw+') dan '+rows[1].team+' ('+rows[1].gw+').';
+ fit(32,526,summary,W-64,9,purple,true);box(32,H-44,W-64,.6,'#DADDE7');fit(32,H-28,'Data: dashboard fpl2026 · Pembaruan '+gwUpdateTimeWIB(LEAGUE_DATA[last].updated),620,7.5,'#777889');text(W-130,H-28,'POIN GW / 01',7.5,'#777889',true);
+ return pdf;
+}
+function downloadWeeklyPointsChartPDF(){
+ const button=document.getElementById('btnPdfWeeklyPoints');button.disabled=true;
+ try{buildWeeklyPointsChartPDF().save('QA-Nippon-Paint-Poin-per-GW.pdf')}
+ catch(error){alert(error.message||'PDF gagal dibuat. Silakan coba lagi.')}
+ finally{button.disabled=false}
+}
+
+function playWeeklyPointsChartAnimation(){
+  if(!weeklyPointsChartInst||weeklyAnimPlaying)return;
+  const chart=weeklyPointsChartInst;
+  const finalMaxX=weeklyPointsChartLabels.length-1;
+  const btn=document.getElementById('btnAnimWeeklyPoints');
+  const pdfBtn=document.getElementById('btnPdfWeeklyPoints');
+  weeklyAnimPlaying=true;
+  if(btn){btn.disabled=true;btn.textContent='▶ Memutar...';btn.style.opacity='0.6';}
+  if(pdfBtn){pdfBtn.disabled=true;pdfBtn.style.opacity='0.5';pdfBtn.style.cursor='not-allowed';}
+  const HOLD=700, SEGMENT=1600;
+  const timeline=[{duration:HOLD,from:0,to:0}],events=weeklyMilestones();
+  for(let x=1;x<=finalMaxX;x++){
+    timeline.push({duration:SEGMENT,from:x-1,to:x});
+    events.filter(e=>e.x===x&&chart.isDatasetVisible(weeklyPointsChartSeries.findIndex(s=>s.label===e.team))).forEach(event=>timeline.push({duration:2200,from:x,to:x,event}));
+  }
+  const DURATION=timeline.reduce((sum,s)=>sum+s.duration,0);
+  // Keep the full axis fixed; reveal data rather than stretching the axis.
+  chart.options.scales.x.max=finalMaxX;
+  function reveal(progress){
+    chart.data.datasets.forEach((dataset,index)=>{
+      const values=weeklyPointsChartSeries[index].values;
+      const whole=Math.floor(progress),fraction=progress-whole;
+      dataset.data=values.slice(0,whole+1).map((y,x)=>({x,y}));
+      if(fraction>0&&whole+1<values.length&&values[whole]!=null&&values[whole+1]!=null){
+        dataset.data.push({x:progress,y:values[whole]+(values[whole+1]-values[whole])*fraction});
+      }
+    });
+    chart.$revealed=progress;
+    chart.$progress=finalMaxX; // Moving endpoint is part of the revealed dataset.
+    chart.update('none');
+  }
+  reveal(0);
+  const t0=performance.now();
+  function tick(now){
+    const elapsed=now-t0;
+    const t=Math.min(elapsed/DURATION,1);
+    let remaining=elapsed,stage=timeline[timeline.length-1];
+    for(const item of timeline){stage=item;if(remaining<item.duration)break;remaining-=item.duration;}
+    const fraction=Math.min(1,remaining/stage.duration);
+    chart.$activeEvent=t<1?(stage.event||null):null;
+    chart.$eventAlpha=stage.event?Math.min(1,remaining/180,(stage.duration-remaining)/280):1;
+    const progress=t>=1?finalMaxX:stage.from+(stage.to-stage.from)*easeInOutQuad(fraction);
+    reveal(progress);
+    if(t<1) weeklyAnimRafId=requestAnimationFrame(tick);
+    else{
+      weeklyAnimPlaying=false;weeklyAnimRafId=null;
+      if(btn){btn.disabled=false;btn.textContent='▶ Putar Animasi';btn.style.opacity='1';}
+      if(pdfBtn){pdfBtn.disabled=false;pdfBtn.style.opacity='1';pdfBtn.style.cursor='pointer';}
+    }
+  }
+  weeklyAnimRafId=requestAnimationFrame(tick);
+}
+document.getElementById('btnAnimWeeklyPoints')?.addEventListener('click',playWeeklyPointsChartAnimation);
+document.getElementById('btnHybridWeeklyPoints')?.addEventListener('click',()=>{
+  if(weeklyAnimRafId){cancelAnimationFrame(weeklyAnimRafId);weeklyAnimRafId=null;weeklyAnimPlaying=false;
+    const bAnim=document.getElementById('btnAnimWeeklyPoints');
+    if(bAnim){bAnim.disabled=false;bAnim.textContent='▶ Putar Animasi';bAnim.style.opacity='1';}}
+  weeklyPointsHybridFocused=!weeklyPointsHybridFocused;buildWeeklyPointsChart();
+});
+document.getElementById('btnPdfWeeklyPoints')?.addEventListener('click',downloadWeeklyPointsChartPDF);
+
+
 const latestLeagueGW=Math.max(...getAllGWs());
 document.getElementById('leagueLatestGW').textContent=String(latestLeagueGW).padStart(2,'0');
 document.getElementById('leagueManagerCount').textContent=LEAGUE_DATA[latestLeagueGW].standings.length+' Manager';
@@ -1025,3 +1350,4 @@ render(latestLeagueGW);
 
 </script>
 </body>
+</html>
