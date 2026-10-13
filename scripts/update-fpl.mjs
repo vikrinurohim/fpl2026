@@ -77,13 +77,19 @@ const LABELS = { minutes: 'Menit bermain', goals_scored: 'Gol', assists: 'Assist
 export function buildPlayers(picksData, elements, clubs, live) {
   const incoming = new Map(picksData.automatic_subs.map(s => [s.element_in, s.element_out]));
   const outgoing = new Map(picksData.automatic_subs.map(s => [s.element_out, s.element_in]));
-  // FPL positions are the submitted selection. Autosubs do not add selected XI slots.
+  if (new Set(picksData.picks.map(p => p.element)).size !== 15) throw new Error('Duplicate or incomplete squad');
+  // FPL moves autosub entrants into positions 1–11. Reverse each pair to recover the submitted XI.
   return picksData.picks.map(pick => {
     const player = elements.get(pick.element), score = live.get(pick.element);
     if (!player || !score || !clubs.has(player.team)) throw new Error(`Incomplete player data: ${pick.element}`);
     const raw = score.stats.total_points;
     const breakdown = score.explain.flatMap(fixture => fixture.stats.filter(s => s.points !== 0).map(s => `${LABELS[s.identifier] || s.identifier} (${s.value}) ${s.points > 0 ? '+' : ''}${s.points}`)).join('; ') || 'Tidak memperoleh poin';
-    const selected = pick.position <= 11;
+    const selected = outgoing.has(pick.element) || (pick.position <= 11 && !incoming.has(pick.element));
+    const originalPosition = outgoing.has(pick.element)
+      ? picksData.picks.find(p => p.element === outgoing.get(pick.element)).position
+      : incoming.has(pick.element)
+        ? picksData.picks.find(p => p.element === incoming.get(pick.element)).position
+        : pick.position;
     const multiplier = pick.multiplier;
     return {
       id: pick.element, name: player.web_name + (pick.is_captain ? ' (C)' : pick.is_vice_captain ? ' (VC)' : ''),
@@ -92,12 +98,32 @@ export function buildPlayers(picksData, elements, clubs, live) {
       status: incoming.has(pick.element) ? 'autosub' : selected ? (score.stats.minutes ? 'started' : 'selected_no_play') : 'bench',
       points_breakdown: breakdown + (multiplier > 1 ? ` → ×${multiplier} captain = ${raw * multiplier} pts` : ''),
       ...(multiplier > 1 ? { captain_multiplier: multiplier } : {}),
-      ...(pick.is_vice_captain ? { is_vice_captain: true } : {}),
+      is_captain: pick.is_captain, is_vice_captain: pick.is_vice_captain,
       ...(outgoing.has(pick.element) ? { note: `Digantikan otomatis oleh ${elements.get(outgoing.get(pick.element)).web_name}` } : {}),
       ...(incoming.has(pick.element) ? { note: `Menggantikan ${elements.get(incoming.get(pick.element)).web_name}` } : {}),
-      selected, multiplier,
+      selected, multiplier, original_position: originalPosition,
     };
-  });
+  }).sort((a, b) => a.original_position - b.original_position);
+}
+
+export function buildLineupWeek(players, picks, gw) {
+  const initial = players.filter(p => p.selected);
+  const subs = players.filter(p => p.status === 'autosub');
+  const boost = picks.active_chip === 'bboost' ? players.filter(p => !p.selected && p.status !== 'autosub').map(p => ({ ...p, status: 'bench_boost' })) : [];
+  const rendered = [...initial, ...subs, ...boost];
+  const score = rendered.reduce((sum, p) => sum + p.points, 0);
+  if (initial.length !== 11 || new Set(rendered.map(p => p.id)).size !== rendered.length || score !== picks.entry_history.points) throw new Error(`Invalid rendered lineup or official score for GW${gw}`);
+  const captain = players.find(p => p.is_captain);
+  const effectiveCaptain = players.find(p => p.multiplier > 1);
+  const clean = p => p?.name.replace(/ \((C|VC)\)$/, '');
+  return {
+    schema_version: 2, gameweek: gw, label: `Gameweek ${gw}`,
+    xi_points: initial.reduce((sum, p) => sum + p.points, 0), gw_points: score,
+    formation: ['DEF', 'MID', 'FWD'].map(pos => initial.filter(p => p.pos === pos).length).join('-'),
+    captain: clean(captain), effective_captain: clean(effectiveCaptain),
+    chip: picks.active_chip, transfer_cost: picks.entry_history.event_transfers_cost,
+    players: rendered,
+  };
 }
 
 function upsertWeek(weeks, record, key) {
@@ -132,7 +158,7 @@ export async function refresh(data, config, api = getJSON, now = new Date()) {
     if (gw < league.start_event) continue;
     const eligible = accounts.filter(a => a.start <= gw);
     if (!eligible.length) continue;
-    const missing = eligible.some(a => !data.DECISION_DATA.managers[a.manager]?.some(w => w.gw === gw));
+    const missing = eligible.some(a => data.LINEUP_SEASON[a.manager]?.by_gameweek?.find(w => w.gameweek === gw)?.schema_version !== 2);
     if (gw !== latest && data.LEAGUE_DATA[gw] && !missing) continue;
     const liveResponse = await api(`event/${gw}/live/`);
     const live = new Map(liveResponse.elements.map(p => [p.id, p]));
@@ -148,8 +174,8 @@ export async function refresh(data, config, api = getJSON, now = new Date()) {
       const players = buildPlayers(picks, elements, clubs, live);
       if (players.reduce((s, p) => s + p.points, 0) !== h.points) throw new Error(`Player points do not match official score for ${member.entry}, GW${gw}`);
       const selected = players.filter(p => p.selected), subs = players.filter(p => p.status === 'autosub');
-      const form = [2, 3, 4].map(type => selected.filter(p => p.pos === POS[type]).length).join('-');
-      const captain = players.find(p => p.multiplier > 1) || players.find(p => / \(C\)$/.test(p.name));
+      const lineupWeek = buildLineupWeek(players, picks, gw);
+      const form = lineupWeek.formation;
       const clubCounts = {};
       selected.forEach(p => { clubCounts[p.club] = (clubCounts[p.club] || 0) + 1; });
       const baseline = history.current.find(w => w.event === start - 1)?.total_points || 0;
@@ -160,13 +186,14 @@ export async function refresh(data, config, api = getJSON, now = new Date()) {
       week.chips.push({ manager, team, chip, note: `${h.event_transfers} transfer · ${picks.automatic_subs.length} autosub` });
       if (h.event_transfers_cost) week.hits.push({ manager, team, cost: h.event_transfers_cost });
       week.bench[team] = h.points_on_bench;
-      week.squads.push({ team, manager, pts: h.points, form, chip, capt: captain?.name.replace(/ \((C|VC)\)$/, ''), gk: selected.filter(p => p.pos === 'GK').map(p => p.name).join(', '), def: selected.filter(p => p.pos === 'DEF').map(p => p.name).join(', '), mid: selected.filter(p => p.pos === 'MID').map(p => p.name).join(', '), fwd: selected.filter(p => p.pos === 'FWD').map(p => p.name).join(', '), clubs: Object.keys(clubCounts).join(', '), clubCounts });
+      week.squads.push({ team, manager, pts: h.points, form, chip, capt: lineupWeek.captain, gk: selected.filter(p => p.pos === 'GK').map(p => p.name).join(', '), def: selected.filter(p => p.pos === 'DEF').map(p => p.name).join(', '), mid: selected.filter(p => p.pos === 'MID').map(p => p.name).join(', '), fwd: selected.filter(p => p.pos === 'FWD').map(p => p.name).join(', '), clubs: Object.keys(clubCounts).join(', '), clubCounts });
       data.CLUB_PLAYERS[manager] ||= {};
       data.CLUB_PLAYERS[manager][gw] = {};
       for (const p of [...selected, ...subs]) (data.CLUB_PLAYERS[manager][gw][p.club] ||= []).push(p);
       const lineup = data.LINEUP_SEASON[manager] ||= { manager, team, scope: 'Starting XI saat deadline; autosub ditampilkan terpisah', by_gameweek: [] };
       lineup.team = team;
-      lineup.by_gameweek = upsertWeek(lineup.by_gameweek, { gameweek: gw, label: week.label, xi_points: selected.reduce((s, p) => s + p.points, 0), formation: form, captain: captain?.name.replace(/ \((C|VC)\)$/, ''), chip: picks.active_chip, transfer_cost: h.event_transfers_cost, players: [...selected, ...subs] }, 'gameweek');
+      lineup.scope = 'XI saat deadline, pengganti otomatis, dan bench saat Bench Boost';
+      lineup.by_gameweek = upsertWeek(lineup.by_gameweek, lineupWeek, 'gameweek');
       // Preserve the existing summary convention: official cumulative score, XI slots only.
       lineup.season_summary = { gameweeks: lineup.by_gameweek.length, total_xi_slots: lineup.by_gameweek.length * 11, total_points: total };
       data.DECISION_DATA.managers[manager] = upsertWeek(data.DECISION_DATA.managers[manager] || [], { gw, team, players: players.map(p => ({ id: p.id, name: elements.get(p.id).web_name, points: p.points_raw, starter: p.selected, captainExtra: p.multiplier > 1 ? p.points_raw * (p.multiplier - 1) : 0 })) }, 'gw');
