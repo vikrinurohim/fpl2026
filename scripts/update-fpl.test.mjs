@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
-import { isFinal, readData, writeData, refresh, getMembers, buildPlayers, buildLineupWeek } from './update-fpl.mjs';
+import { isFinal, readData, writeData, refresh, getMembers, buildPlayers, buildLineupWeek, historicalClub } from './update-fpl.mjs';
 
 function fixture() {
   const data = { LEAGUE_DATA: {}, CLUB_PLAYERS: {}, LINEUP_SEASON: {}, DECISION_DATA: { managers: {} }, LINEUP_TRANSFER_TIMING: { managers: {}, deadlines: {}, checkedAt: '' }, VERIFIED_HIT_TRANSFERS: {} };
@@ -16,6 +16,8 @@ function fixture() {
   const api = async path => {
     calls.push(path);
     if (path === 'bootstrap-static/') return { events, elements, teams: [{ id: 1, short_name: 'ARS' }] };
+    if (path === 'fixtures/') return [{ id: 101, team_h: 1, team_a: 2 }, { id: 102, team_h: 1, team_a: 2 }];
+    if (path.startsWith('element-summary/')) return { history: [{ round: 1, fixture: 101, was_home: true }, { round: 2, fixture: 102, was_home: true }] };
     if (path.startsWith('leagues-classic/')) return { league: { start_event: 1 }, standings: { has_next: false, results: [{ entry: 42, entry_name: 'Team', player_name: 'Manager' }] } };
     if (path === 'entry/42/history/') return { current: [history, { event: 2, total_points: 99, event_transfers: 1 }] };
     if (path === 'entry/42/') return { started_event: 1 };
@@ -161,7 +163,7 @@ test('all stored manager weeks have unique players, eleven submitted starters an
   const data = readData(await fs.readFile('index.html', 'utf8'));
   for (const [manager, season] of Object.entries(data.LINEUP_SEASON)) {
     for (const week of season.by_gameweek) {
-      assert.equal(week.schema_version, 2, `${manager}, GW${week.gameweek}: obsolete lineup schema`);
+      assert.equal(week.schema_version, 3, `${manager}, GW${week.gameweek}: obsolete lineup schema`);
       assert.equal(new Set(week.players.map(p => p.id)).size, week.players.length, `${manager}: duplicate player`);
       assert.equal(week.players.filter(p => p.selected).length, 11);
       const official = data.LEAGUE_DATA[week.gameweek].standings.find(s => s.manager === manager);
@@ -172,4 +174,12 @@ test('all stored manager weeks have unique players, eleven submitted starters an
       assert.equal(new Set(clubPlayers.map(p => p.id)).size, clubPlayers.length);
     }
   }
+});
+test('historical club comes from the player match record after a club transfer', () => {
+  const fixtures = new Map([[1, { team_h: 7, team_a: 13 }], [2, { team_h: 13, team_a: 9 }]]);
+  const summary = { history: [{ round: 1, fixture: 1, was_home: true }, { round: 2, fixture: 2, was_home: false }] };
+  assert.equal(historicalClub(summary, fixtures, 1, 9), 7);
+  assert.equal(historicalClub(summary, fixtures, 2, 9), 9);
+  assert.equal(historicalClub(summary, fixtures, 3, 9), 9);
+  assert.throws(() => historicalClub(summary, new Map(), 1, 9), /Missing historical fixture/);
 });
