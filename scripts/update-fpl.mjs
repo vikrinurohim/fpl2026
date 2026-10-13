@@ -74,14 +74,22 @@ export async function getMembers(leagueId, api) {
 const POS = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 const CHIPS = { bboost: 'Bench Boost', '3xc': 'Triple Captain', freehit: 'Free Hit', wildcard: 'Wildcard' };
 const LABELS = { minutes: 'Menit bermain', goals_scored: 'Gol', assists: 'Assist', clean_sheets: 'Clean sheet', goals_conceded: 'Kebobolan', own_goals: 'Gol bunuh diri', penalties_saved: 'Penalti diselamatkan', penalties_missed: 'Penalti gagal', yellow_cards: 'Kartu kuning', red_cards: 'Kartu merah', saves: 'Penyelamatan', bonus: 'Bonus', defensive_contribution: 'Kontribusi bertahan' };
-export function buildPlayers(picksData, elements, clubs, live) {
+export function historicalClub(summary, fixtures, gw, fallback) {
+  const history = summary.history.filter(h => h.round === gw);
+  if (!history.length) return fallback; // Blank gameweek: there is no match record to resolve.
+  const fixture = fixtures.get(history[0].fixture);
+  if (!fixture) throw new Error(`Missing historical fixture for GW${gw}`);
+  return history[0].was_home ? fixture.team_h : fixture.team_a;
+}
+export function buildPlayers(picksData, elements, clubs, live, historicalTeams = new Map()) {
   const incoming = new Map(picksData.automatic_subs.map(s => [s.element_in, s.element_out]));
   const outgoing = new Map(picksData.automatic_subs.map(s => [s.element_out, s.element_in]));
   if (new Set(picksData.picks.map(p => p.element)).size !== 15) throw new Error('Duplicate or incomplete squad');
   // FPL moves autosub entrants into positions 1–11. Reverse each pair to recover the submitted XI.
   return picksData.picks.map(pick => {
     const player = elements.get(pick.element), score = live.get(pick.element);
-    if (!player || !score || !clubs.has(player.team)) throw new Error(`Incomplete player data: ${pick.element}`);
+    const club = historicalTeams.get(pick.element) ?? player?.team;
+    if (!player || !score || !clubs.has(club)) throw new Error(`Incomplete player data: ${pick.element}`);
     const raw = score.stats.total_points;
     const breakdown = score.explain.flatMap(fixture => fixture.stats.filter(s => s.points !== 0).map(s => `${LABELS[s.identifier] || s.identifier} (${s.value}) ${s.points > 0 ? '+' : ''}${s.points}`)).join('; ') || 'Tidak memperoleh poin';
     const selected = outgoing.has(pick.element) || (pick.position <= 11 && !incoming.has(pick.element));
@@ -93,7 +101,7 @@ export function buildPlayers(picksData, elements, clubs, live) {
     const multiplier = pick.multiplier;
     return {
       id: pick.element, name: player.web_name + (pick.is_captain ? ' (C)' : pick.is_vice_captain ? ' (VC)' : ''),
-      club: clubs.get(player.team).short_name, pos: POS[player.element_type], minutes: score.stats.minutes,
+      club: clubs.get(club).short_name, pos: POS[player.element_type], minutes: score.stats.minutes,
       points: raw * multiplier, points_raw: raw,
       status: incoming.has(pick.element) ? 'autosub' : selected ? (score.stats.minutes ? 'started' : 'selected_no_play') : 'bench',
       points_breakdown: breakdown + (multiplier > 1 ? ` → ×${multiplier} captain = ${raw * multiplier} pts` : ''),
@@ -117,7 +125,7 @@ export function buildLineupWeek(players, picks, gw) {
   const effectiveCaptain = players.find(p => p.multiplier > 1);
   const clean = p => p?.name.replace(/ \((C|VC)\)$/, '');
   return {
-    schema_version: 2, gameweek: gw, label: `Gameweek ${gw}`,
+    schema_version: 3, gameweek: gw, label: `Gameweek ${gw}`,
     xi_points: initial.reduce((sum, p) => sum + p.points, 0), gw_points: score,
     formation: ['DEF', 'MID', 'FWD'].map(pos => initial.filter(p => p.pos === pos).length).join('-'),
     captain: clean(captain), effective_captain: clean(effectiveCaptain),
@@ -140,6 +148,8 @@ export async function refresh(data, config, api = getJSON, now = new Date()) {
   const { members, league } = await getMembers(config.leagueId, api);
   const elements = new Map(bootstrap.elements.map(p => [p.id, p]));
   const clubs = new Map(bootstrap.teams.map(t => [t.id, t]));
+  const fixtures = new Map((await api('fixtures/')).map(f => [f.id, f]));
+  const playerSummaries = new Map();
   const latest = finalEvents.at(-1).id;
   const accounts = [];
   for (const member of members) {
@@ -158,7 +168,7 @@ export async function refresh(data, config, api = getJSON, now = new Date()) {
     if (gw < league.start_event) continue;
     const eligible = accounts.filter(a => a.start <= gw);
     if (!eligible.length) continue;
-    const missing = eligible.some(a => data.LINEUP_SEASON[a.manager]?.by_gameweek?.find(w => w.gameweek === gw)?.schema_version !== 2);
+    const missing = eligible.some(a => data.LINEUP_SEASON[a.manager]?.by_gameweek?.find(w => w.gameweek === gw)?.schema_version !== 3);
     if (gw !== latest && data.LEAGUE_DATA[gw] && !missing) continue;
     const liveResponse = await api(`event/${gw}/live/`);
     const live = new Map(liveResponse.elements.map(p => [p.id, p]));
@@ -171,7 +181,12 @@ export async function refresh(data, config, api = getJSON, now = new Date()) {
       const picks = await api(`entry/${member.entry}/event/${gw}/picks/`);
       const h = picks.entry_history;
       if (h.event !== gw || picks.picks.length !== 15) throw new Error(`Incomplete picks for ${member.entry}, GW${gw}`);
-      const players = buildPlayers(picks, elements, clubs, live);
+      const historicalTeams = new Map();
+      for (const pick of picks.picks) {
+        if (!playerSummaries.has(pick.element)) playerSummaries.set(pick.element, await api(`element-summary/${pick.element}/`));
+        historicalTeams.set(pick.element, historicalClub(playerSummaries.get(pick.element), fixtures, gw, elements.get(pick.element)?.team));
+      }
+      const players = buildPlayers(picks, elements, clubs, live, historicalTeams);
       if (players.reduce((s, p) => s + p.points, 0) !== h.points) throw new Error(`Player points do not match official score for ${member.entry}, GW${gw}`);
       const selected = players.filter(p => p.selected), subs = players.filter(p => p.status === 'autosub');
       const lineupWeek = buildLineupWeek(players, picks, gw);
